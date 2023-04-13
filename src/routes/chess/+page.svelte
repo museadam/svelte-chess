@@ -219,6 +219,40 @@
 			return false;
 		}
 	}
+	function getValidMovesForBishop(position, newPos) {
+		const validMoves = [];
+		// The bishop can move diagonally in any direction, so we need to check all diagonal lines
+		for (let i = -7; i <= 7; i++) {
+			// Ignore moves that don't actually move the bishop
+			if (i === 0) {
+				continue;
+			}
+
+			// Check the diagonal line that goes from top-left to bottom-right
+			let row = position[0] + i;
+			let col = position[1] + i;
+			if (row >= 0 && row <= 7 && col >= 0 && col <= 7) {
+				validMoves.push([row, col]);
+			}
+
+			// Check the diagonal line that goes from top-right to bottom-left
+			row = position[0] + i;
+			col = position[1] - i;
+			if (row >= 0 && row <= 7 && col >= 0 && col <= 7) {
+				validMoves.push([row, col]);
+			}
+		}
+		const search = newPos;
+		const matrix = validMoves;
+
+		const found = matrix.some((arr) => arr.every((val, i) => val === search[i]));
+
+		if (found) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	function validateMove(piece, currentPos, newPos) {
 		// const moves = [];
 		// // Calculate valid moves for knight
@@ -248,15 +282,13 @@
 			case 'black-knight':
 				// TODO: add logic for knight
 				moveValid = true;
-
 				break;
 			case 'white-bishop':
-				moveValid = true;
+				moveValid = getValidMovesForBishop(currentPos, newPos);
 				break;
 			case 'black-bishop':
 				// TODO: add logic for bishop
-				moveValid = true;
-
+				moveValid = getValidMovesForBishop(currentPos, newPos);
 				break;
 			case 'white-queen':
 				moveValid = true;
