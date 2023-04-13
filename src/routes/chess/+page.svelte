@@ -66,352 +66,196 @@
 	console.log(board);
 	// let board = [];
 
-	// function createBoard() {
-	// 	const board = [];
-	// 	for (let row = 0; row < rows.length; row++) {
-	// 		for (let col = 0; col < columns.length; col++) {
-	// 			const square = {
-	// 				row,
-	// 				col,
-	// 				piece: null
-	// 			};
-	// 			board.push(square);
-	// 		}
-	// 	}
-	// 	return board;
-	// }
-	// $: board = createBoard();
-	function movePiece(position) {
-		const selectedPiece = pieces.find((piece) => piece.position === position);
-
-		if (!selectedPiece) {
-			// If no piece is selected, do nothing
-			return;
-		}
-
-		const validMoves = getValidMoves(selectedPiece);
-
-		const destination = prompt(`Valid moves: ${validMoves.join(', ')}. Choose a destination:`);
-
-		if (!destination || !validMoves.includes(destination)) {
-			// If no destination is chosen or the destination is not valid, do nothing
-			return;
-		}
-
-		selectedPiece.position = destination;
-
-		// Update the board
-		board = createBoard(rows, columns, pieces);
-	}
 	function handleKeyPress(event) {
 		console.log(event);
 	}
-	function getRowAndColumn(position) {
-		const file = position.charAt(0);
-		const rank = parseInt(position.charAt(1), 10) - 1;
+	function getRowAndColumn(square) {
+		const file = square.charAt(0);
+		const rank = parseInt(square.charAt(1), 10) - 1;
 		const column = file.charCodeAt(0) - 97;
 		const row = 7 - rank;
 		return [row, column];
 	}
-	const knightMoves = [
-		[2, 1],
-		[1, 2],
-		[-1, 2],
-		[-2, 1],
-		[-2, -1],
-		[-1, -2],
-		[1, -2],
-		[2, -1]
-	];
-	const bishopMoves = [
-		[-1, -1],
-		[-1, 1],
-		[1, -1],
-		[1, 1]
-	];
-	const rookMoves = [
-		[-1, 0],
-		[0, -1],
-		[1, 0],
-		[0, 1]
-	];
-	const queenMoves = [
-		[-1, 0],
-		[0, -1],
-		[1, 0],
-		[0, 1],
-		[-1, -1],
-		[-1, 1],
-		[1, -1],
-		[1, 1]
-	];
+	function pawnBlkMove(currentPos, newPos) {
+		const [currentRow, currentCol] = currentPos;
+		const [newRow, newCol] = newPos;
 
-	const kingMoves = [
-		[-1, -1],
-		[-1, 0],
-		[-1, 1],
-		[0, -1],
-		[0, 1],
-		[1, -1],
-		[1, 0],
-		[1, 1]
-	];
-	let row;
-	let column;
-	let piece;
-	function getValidMoves(piece) {
-		const validMoves = [];
-		// Calculate valid moves for knight
+		// check if pawn is moving forward
+		if (newCol !== currentCol) {
+			console.log('hi1');
+			return false;
+		}
 
-		let knightRow;
-		let knightColumn;
+		// check if pawn is moving more than one space forward
+		if (newRow - currentRow > 2) {
+			console.log('hi2');
 
-		let kingRow;
-		let kingColumn;
+			return false;
+		}
 
-		switch (piece.type) {
-			case 'pawn':
-				// Calculate valid moves for pawn
-				row = parseInt(piece.position[1]);
-				column = columns.indexOf(piece.position[0]);
+		// check if pawn is moving backwards
+		if (newRow <= currentRow) {
+			console.log('hi3');
 
-				// Calculate valid moves for white pawn
-				if (piece.color === 'white') {
-					if (row === 2) {
-						// White pawn can move two squares forward from starting position
-						if (!board[3][column].piece) {
-							validMoves.push(`${columns[column]}3`);
-							if (!board[4][column].piece) {
-								validMoves.push(`${columns[column]}4`);
-							}
-						}
-					}
+			return false;
+		}
 
-					// White pawn can move one square forward if destination square is empty
-					if (row < 8 && !board[row][column].piece) {
-						validMoves.push(`${columns[column]}${row + 1}`);
-					}
+		// check if pawn is moving two spaces forward on its first move
+		if (currentRow === 1 && newRow === 3) {
+			console.log('hi4');
 
-					// White pawn can capture diagonally if destination square contains a black piece
-					if (row < 8 && column > 0 && board[row + 1][column - 1].piece?.color === 'black') {
-						validMoves.push(`${columns[column - 1]}${row + 1}`);
-					}
+			return true;
+		}
+		// check if pawn is moving one space forward
+		if (newRow - currentRow !== 1) {
+			console.log('hi5' + (newRow - currentRow));
 
-					if (row < 8 && column < 7 && board[row + 1][column + 1].piece?.color === 'black') {
-						validMoves.push(`${columns[column + 1]}${row + 1}`);
-					}
-				}
-				// Calculate valid moves for black pawn
-				else if (piece.color === 'black') {
-					if (row === 7) {
-						// Black pawn can move two squares forward from starting position
-						if (!board[6][column].piece) {
-							validMoves.push(`${columns[column]}6`);
-							if (!board[5][column].piece) {
-								validMoves.push(`${columns[column]}5`);
-							}
-						}
-					}
+			return false;
+		}
+		console.log(newRow - currentRow);
 
-					// Black pawn can move one square forward if destination square is empty
-					if (row > 1 && !board[row - 2][column].piece) {
-						validMoves.push(`${columns[column]}${row - 1}`);
-					}
+		// check if there is a piece blocking the pawn's path
+		// if (board[newRow][newCol] !== null) {
+		// 	return false;
+		// }
 
-					// Black pawn can capture diagonally if destination square contains a white piece
-					if (row > 1 && column > 0 && board[row - 2][column - 1].piece?.color === 'white') {
-						validMoves.push(`${columns[column - 1]}${row - 1}`);
-					}
+		// valid move
+		return true;
+	}
 
-					if (row > 1 && column < 7 && board[row - 2][column + 1].piece?.color === 'white') {
-						validMoves.push(`${columns[column + 1]}${row - 1}`);
-					}
-				}
+	function pawnWtMove(currentPos, newPos) {
+		const [currentRow, currentCol] = currentPos;
+		const [newRow, newCol] = newPos;
+
+		// check if pawn is moving forward
+		if (newCol !== currentCol) {
+			console.log('hi1');
+			return false;
+		}
+
+		// check if pawn is moving more than one space forwards
+		if (newRow - currentRow > 2) {
+			console.log('hi2');
+
+			return false;
+		}
+
+		// check if pawn is moving direction
+		if (newRow >= currentRow) {
+			console.log('hi3');
+
+			return false;
+		}
+
+		// check if pawn is moving two spaces forward on its first move
+		if (currentRow === 6 && newRow === 4) {
+			console.log('hi4');
+
+			return true;
+		}
+
+		// check if pawn is moving one space forward
+		if (newRow - currentRow !== -1) {
+			console.log(newRow - currentRow);
+			console.log('hi5' + (newRow - currentRow));
+
+			return false;
+		}
+
+		// check if there is a piece blocking the pawn's path
+		// if (board[newRow][newCol] !== null) {
+		// 	return false;
+		// }
+
+		// valid move
+		return true;
+	}
+	let moveValid = false;
+	let attackValid = false;
+	function validateMove(piece, currentPos, newPos) {
+		// const moves = [];
+		// // Calculate valid moves for knight
+		// const piec = board.find((p) => p.square === square);
+
+		// if (!piec) {
+		// 	return moves;
+		// }
+
+		switch (piece) {
+			case 'white-pawn':
+				moveValid = pawnWtMove(currentPos, newPos);
 				break;
-			case 'knight':
-				[knightRow, knightColumn] = getRowAndColumn(piece.position);
-				row = parseInt(piece.position[1]);
-				column = columns.indexOf(piece.position[0]);
-
-				for (const [rowOffset, columnOffset] of knightMoves) {
-					const destinationRow = knightRow + rowOffset;
-					const destinationColumn = knightColumn + columnOffset;
-
-					if (
-						destinationRow >= 0 &&
-						destinationRow <= 7 &&
-						destinationColumn >= 0 &&
-						destinationColumn <= 7
-					) {
-						const destinationSquare = board[destinationRow][destinationColumn];
-
-						if (!destinationSquare.piece || destinationSquare.piece.color !== piece.color) {
-							validMoves.push(destinationSquare.position);
-						}
-					}
-				}
+			case 'black-pawn':
+				moveValid = pawnBlkMove(currentPos, newPos);
 				break;
-			case 'bishop':
-				row = parseInt(piece.position[1]);
-				column = columns.indexOf(piece.position[0]);
-				for (const [rowOffset, columnOffset] of bishopMoves) {
-					for (let i = 1; i <= 7; i++) {
-						const destinationRow = row + i * rowOffset;
-						const destinationColumn = column + i * columnOffset;
-
-						if (
-							destinationRow < 0 ||
-							destinationRow > 7 ||
-							destinationColumn < 0 ||
-							destinationColumn > 7
-						) {
-							break;
-						}
-
-						const destinationSquare = board[destinationRow][destinationColumn];
-
-						if (!destinationSquare.piece) {
-							validMoves.push([destinationRow, destinationColumn]);
-						} else {
-							if (destinationSquare.piece.color !== board[row][column].piece.color) {
-								validMoves.push([destinationRow, destinationColumn]);
-							}
-							break;
-						}
-					}
-				}
+			case 'white-rook':
+				moveValid = true;
 				break;
-			case 'rook':
-				row = parseInt(piece.position[1]);
-				column = columns.indexOf(piece.position[0]);
-
-				for (const [rowOffset, columnOffset] of rookMoves) {
-					for (let i = 1; i <= 7; i++) {
-						const destinationRow = row + i * rowOffset;
-						const destinationColumn = column + i * columnOffset;
-
-						if (
-							destinationRow < 0 ||
-							destinationRow > 7 ||
-							destinationColumn < 0 ||
-							destinationColumn > 7
-						) {
-							break;
-						}
-
-						const destinationSquare = board[destinationRow][destinationColumn];
-
-						if (!destinationSquare.piece) {
-							validMoves.push([destinationRow, destinationColumn]);
-						} else {
-							if (destinationSquare.piece.color !== board[row][column].piece.color) {
-								validMoves.push([destinationRow, destinationColumn]);
-							}
-							break;
-						}
-					}
-				}
+			case 'black-rook':
+				// TODO: add logic for rook
+				moveValid = true;
 				break;
-			case 'queen':
-				for (const [rowOffset, columnOffset] of queenMoves) {
-					for (let i = 1; i <= 7; i++) {
-						const destinationRow = row + i * rowOffset;
-						const destinationColumn = column + i * columnOffset;
-
-						if (
-							destinationRow < 0 ||
-							destinationRow > 7 ||
-							destinationColumn < 0 ||
-							destinationColumn > 7
-						) {
-							break;
-						}
-
-						const destinationSquare = board[destinationRow][destinationColumn];
-
-						if (!destinationSquare.piece) {
-							validMoves.push([destinationRow, destinationColumn]);
-						} else {
-							if (destinationSquare.piece.color !== board[row][column].piece.color) {
-								validMoves.push([destinationRow, destinationColumn]);
-							}
-							break;
-						}
-					}
-				}
+			case 'white-knight':
+				moveValid = true;
+				break;
+			case 'black-knight':
+				// TODO: add logic for knight
+				moveValid = true;
 
 				break;
-			case 'king':
-				[kingRow, kingColumn] = getRowAndColumn(piece.position);
+			case 'white-bishop':
+				moveValid = true;
+				break;
+			case 'black-bishop':
+				// TODO: add logic for bishop
+				moveValid = true;
 
-				for (const [rowOffset, columnOffset] of kingMoves) {
-					const destinationRow = kingRow + rowOffset;
-					const destinationColumn = kingColumn + columnOffset;
+				break;
+			case 'white-queen':
+				moveValid = true;
+				break;
+			case 'black-queen':
+				// TODO: add logic for queen
+				moveValid = true;
 
-					if (
-						destinationRow >= 0 &&
-						destinationRow <= 7 &&
-						destinationColumn >= 0 &&
-						destinationColumn <= 7
-					) {
-						const destinationSquare = board[destinationRow][destinationColumn];
+				break;
+			case 'white-king':
+				moveValid = true;
+				break;
+			case 'black-king':
+				// TODO: add logic for king
+				moveValid = true;
 
-						if (!destinationSquare.piece || destinationSquare.piece.color !== piece.color) {
-							validMoves.push(destinationSquare.position);
-						}
-					}
-				}
-
-				// Check for castling moves and logic for what king can do
-				// if (!piece.hasMoved) {
-				// 	const row = piece.color === 'white' ? 7 : 0;
-
-				// 	const kingsideRook = board[row][7].piece;
-				// 	const queensideRook = board[row][0].piece;
-
-				// 	if (kingsideRook && kingsideRook.type === 'rook' && !kingsideRook.hasMoved) {
-				// 		const path = board[row].slice(kingColumn + 1, kingsideRook.position.charAt(0) - 'a');
-
-				// 		if (
-				// 			path.every((square) => !square.piece) &&
-				// 			!isAttacked(board, piece.color, [kingRow, kingColumn + 1]) &&
-				// 			!isAttacked(board, piece.color, [kingRow, kingColumn + 2])
-				// 		) {
-				// 			validMoves.push(`${kingsideRook.position.charAt(0)}${row + 1}`);
-				// 		}
-				// 	}
-
-				// 	if (queensideRook && queensideRook.type === 'rook' && !queensideRook.hasMoved) {
-				// 		const path = board[row].slice(queensideRook.position.charAt(0) - 'a' + 1, kingColumn);
-
-				// 		if (
-				// 			path.every((square) => !square.piece) &&
-				// 			!isAttacked(board, piece.color, [kingRow, kingColumn - 1]) &&
-				// 			!isAttacked(board, piece.color, [kingRow, kingColumn - 2])
-				// 		) {
-				// 			validMoves.push(`${queensideRook.position.charAt(0)}${row + 1}`);
-				// 		}
-				// 	}
-				// }
 				break;
 			default:
 				break;
 		}
 
-		return validMoves;
+		return moveValid;
 	}
 	// export let board;
 
-	function handleDrop(event, row, square) {
+	async function handleDrop(event, row, square) {
 		// Get the piece data from the data transfer object
 		const [piece, rowIndex, pieceSquare, pieceColor] = event.dataTransfer
 			.getData('text/plain')
 			.split(',');
 
-		// Check if the move is valid
-		const isValidMove = true; // checkMove(board, [piecePosition], [row, square.position]);
+		// is piece a piece??
+		const selectedPiece = board.find((piece) => piece.square === pieceSquare);
+		console.log(selectedPiece);
 
-		if (isValidMove) {
+		// Check if the move is valid
+		const currentPos = getRowAndColumn(pieceSquare);
+		const newPos = getRowAndColumn(square.square);
+		console.log(currentPos);
+		console.log(newPos);
+
+		// validateMove(piece, currentPos, newPos);
+		const isValidMove = validateMove(piece, currentPos, newPos); // moveValid; // true; // checkMove(board, [piecePosition], [row, square.position]);
+		const isAttackValid = attackValid;
+
+		if (isValidMove && square.piece === '' && selectedPiece) {
 			// Update the board state with the new position of the piece
 
 			// new position
@@ -419,19 +263,29 @@
 
 			board[row].piece = piece;
 			// board[row].type = square.position //  = { position: square.position, type: pieceType, color: pieceColor };
-			console.log(typeof row);
-			console.log(typeof rowIndex);
+			// console.log(typeof row);
+			// console.log(typeof rowIndex);
 
-			// remove old positon
-			board[rowIndex].piece = '';
+			// remove old position if position is diff
+			if (square.square !== pieceSquare) {
+				board[rowIndex].piece = '';
+			}
 		}
 
 		event.preventDefault();
 	}
+	let handleDragFlag = false;
+	function handleDragOver(event, square) {
+		// console.log(square);
+		// console.log('event');
 
-	function handleDragOver(event) {
 		event.preventDefault();
-		event.dataTransfer.dropEffect = 'move';
+		event.dataTransfer.dropEffect = 'drop';
+	}
+
+	function handleChessComponent(event) {
+		console.log(event);
+		handleDragFlag = event;
 	}
 </script>
 
@@ -439,15 +293,14 @@
 	{#each board as square, rowIndex}
 		<div class="chess-row">
 			<!-- {#each square as col, columnIndex}-->
+			<!-- {square.square} -->
 			<div
 				class="square {square.color}"
-				on:keypress={() => handleKeyPress}
 				on:drop={(event) => handleDrop(event, rowIndex, square)}
-				on:dragover={handleDragOver}
-				on:click={() => movePiece(square)}
+				on:dragover={() => handleDragOver(event, square)}
 			>
 				{#if square.piece}
-					<ChessPiece {square} {rowIndex}>
+					<ChessPiece {square} {rowIndex} on:dragger={() => handleChessComponent}>
 						<span class={square.piece} />
 					</ChessPiece>
 				{/if}
@@ -475,6 +328,15 @@
 </div>
 
 <style>
+	:global([draggable]) {
+		-webkit-touch-callout: none;
+		-ms-touch-action: none;
+		touch-action: none;
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+	}
 	.chess-board {
 		display: grid;
 		grid-template-columns: repeat(8, 50px);
