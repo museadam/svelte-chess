@@ -172,6 +172,53 @@
 	}
 	let moveValid = false;
 	let attackValid = false;
+	function getValidMovesForRook(position, newPos) {
+		const file = position[0];
+		const rank = position[1];
+		const validMoves = [];
+
+		// check horizontal moves
+		for (let i = 0; i < 8; i++) {
+			if (i !== file) {
+				const row = i;
+				validMoves.push([row, rank]);
+			}
+		}
+
+		// check vertical moves
+		for (let i = 0; i <= 8; i++) {
+			if (i !== rank) {
+				const row = file;
+				const col = i;
+				validMoves.push([row, col]);
+			}
+		}
+		const matrix = validMoves;
+		const search = newPos;
+
+		console.log(matrix);
+
+		console.log(search);
+		const found = matrix.some((arr) => arr.every((val, i) => val === search[i]));
+		// let found;
+		// for (let i = 0; i < validMoves.length; i++) {
+		// 	console.log(search);
+		// 	console.log(validMoves[i]);
+
+		// 	if (validMoves[i] === newPos) {
+		// 		found = true;
+		// 	} else {
+		// 		found = false;
+		// 	}
+		// }
+		console.log(found);
+
+		if (found) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	function validateMove(piece, currentPos, newPos) {
 		// const moves = [];
 		// // Calculate valid moves for knight
@@ -189,11 +236,11 @@
 				moveValid = pawnBlkMove(currentPos, newPos);
 				break;
 			case 'white-rook':
-				moveValid = true;
+				moveValid = getValidMovesForRook(currentPos, newPos);
 				break;
 			case 'black-rook':
 				// TODO: add logic for rook
-				moveValid = true;
+				moveValid = getValidMovesForRook(currentPos, newPos);
 				break;
 			case 'white-knight':
 				moveValid = true;
@@ -254,6 +301,7 @@
 		// validateMove(piece, currentPos, newPos);
 		const isValidMove = validateMove(piece, currentPos, newPos); // moveValid; // true; // checkMove(board, [piecePosition], [row, square.position]);
 		const isAttackValid = attackValid;
+		console.log(isValidMove);
 
 		if (isValidMove && square.piece === '' && selectedPiece) {
 			// Update the board state with the new position of the piece
