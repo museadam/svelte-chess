@@ -253,6 +253,69 @@
 			return false;
 		}
 	}
+
+	function getValidMovesKnight(position, newPos) {
+		const moves = [];
+		const [x, y] = position;
+		const potentialMoves = [
+			[x + 2, y + 1],
+			[x + 2, y - 1],
+			[x - 2, y + 1],
+			[x - 2, y - 1],
+			[x + 1, y + 2],
+			[x + 1, y - 2],
+			[x - 1, y + 2],
+			[x - 1, y - 2]
+		];
+
+		for (let i = 0; i < potentialMoves.length; i++) {
+			const [nextX, nextY] = potentialMoves[i];
+			if (nextX < 0 || nextX > 7 || nextY < 0 || nextY > 7) {
+				continue; // Skip invalid moves that go off the board
+			}
+			moves.push([nextX, nextY]);
+		}
+
+		const search = newPos;
+		const matrix = moves;
+		// console.log(search);
+		// console.log(moves);
+
+		const found = matrix.some((arr) => arr.every((val, i) => val === search[i]));
+
+		if (found) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	function kingMove(currentPos, newPos) {
+		const [currentRow, currentCol] = currentPos;
+		const [newRow, newCol] = newPos;
+
+		if (newRow - currentRow > 1) {
+			console.log('row check');
+
+			return false;
+		}
+		if (newCol - currentCol > 1) {
+			console.log('col check');
+
+			return false;
+		}
+		if (currentRow - newRow > 1) {
+			console.log('row check');
+
+			return false;
+		}
+		if (currentCol - newCol > 1) {
+			console.log('col check');
+
+			return false;
+		}
+		return true;
+	}
 	function validateMove(piece, currentPos, newPos) {
 		// const moves = [];
 		// // Calculate valid moves for knight
@@ -261,6 +324,8 @@
 		// if (!piec) {
 		// 	return moves;
 		// }
+		const movableBish = getValidMovesForBishop(currentPos, newPos);
+		const movableRook = getValidMovesForRook(currentPos, newPos);
 
 		switch (piece) {
 			case 'white-pawn':
@@ -270,40 +335,45 @@
 				moveValid = pawnBlkMove(currentPos, newPos);
 				break;
 			case 'white-rook':
-				moveValid = getValidMovesForRook(currentPos, newPos);
+				moveValid = movableRook;
 				break;
 			case 'black-rook':
 				// TODO: add logic for rook
-				moveValid = getValidMovesForRook(currentPos, newPos);
+				moveValid = movableRook;
 				break;
 			case 'white-knight':
-				moveValid = true;
+				moveValid = getValidMovesKnight(currentPos, newPos);
 				break;
 			case 'black-knight':
 				// TODO: add logic for knight
-				moveValid = true;
+				moveValid = getValidMovesKnight(currentPos, newPos);
 				break;
 			case 'white-bishop':
-				moveValid = getValidMovesForBishop(currentPos, newPos);
+				moveValid = movableBish;
 				break;
 			case 'black-bishop':
 				// TODO: add logic for bishop
-				moveValid = getValidMovesForBishop(currentPos, newPos);
+				moveValid = movableBish;
 				break;
 			case 'white-queen':
-				moveValid = true;
+				moveValid = movableRook === false ? movableBish : true;
+
 				break;
 			case 'black-queen':
 				// TODO: add logic for queen
-				moveValid = true;
+				console.log(movableBish);
+				console.log(movableRook);
+				console.log('movableBish');
+				console.log('movableRook');
+				moveValid = movableRook === false ? movableBish : true;
 
 				break;
 			case 'white-king':
-				moveValid = true;
+				moveValid = kingMove(currentPos, newPos);
 				break;
 			case 'black-king':
 				// TODO: add logic for king
-				moveValid = true;
+				moveValid = kingMove(currentPos, newPos);
 
 				break;
 			default:
