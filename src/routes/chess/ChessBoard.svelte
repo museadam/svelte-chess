@@ -343,8 +343,10 @@
 		const [color, p] = square.piece.split('-');
 		const [selectedColor, sp] = selectedPiece.piece.split('-');
 		if (square.piece === '') {
-			attackMove = true;
-		} else if (color !== selectedColor) {
+			attackMove = false;
+		} else if (color == selectedColor) {
+			attackMove = false;
+		} else {
 			attackMove = true;
 		}
 
@@ -358,21 +360,21 @@
 
 		if (isValidMove && selectedPiece) {
 			// Update the board state with the new position of the piece
-
-			// new position
-			console.log(square);
-
-			board[row].piece = piece;
-			// board[row].type = square.position //  = { position: square.position, type: pieceType, color: pieceColor };
-			// console.log(typeof row);
-			// console.log(typeof rowIndex);
 			if (attackMove) {
+				board[row].piece = piece;
+
 				myKills.push(board[rowIndex].piece);
 				attackMove = false;
-			}
-			// remove old position if position is diff
-			if (square.square !== pieceSquare) {
-				board[rowIndex].piece = '';
+
+				if (square.square !== pieceSquare) {
+					board[rowIndex].piece = '';
+				}
+			} else if (square.piece === '') {
+				board[row].piece = piece;
+
+				if (square.square !== pieceSquare) {
+					board[rowIndex].piece = '';
+				}
 			}
 		}
 
