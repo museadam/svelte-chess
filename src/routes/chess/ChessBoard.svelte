@@ -1,6 +1,8 @@
 <script lang="ts">
 	import ChessPiece from './ChessPiece.svelte';
 	export let board;
+	export let myKills;
+
 	function handleKeyPress(event) {
 		console.log(event);
 	}
@@ -17,9 +19,20 @@
 		const [currentRow, currentCol] = currentPos;
 		const [newRow, newCol] = newPos;
 
+		const checkCol = currentCol - 1 === newCol || currentCol + 1 === newCol;
+		// const checkRow = currentRow - 1 === newRow || currentRow + 1 === newRow;
+		const checkUpDown = newRow - currentRow !== 1;
+		console.log(checkUpDown);
+		console.log('checkUpDown');
+
+		// is it attacking left to right?
+		if (newRow <= currentRow) {
+			console.log('hi3');
+			return false;
+		}
 		// check if pawn is moving forward
 		if (newCol !== currentCol) {
-			if ((currentCol - 1 === newCol || currentCol + 1 === newCol) && attackMove) {
+			if (checkCol && !checkUpDown && attackMove) {
 				console.log('attack');
 
 				return true;
@@ -33,13 +46,6 @@
 		// check if pawn is moving more than one space forward
 		if (newRow - currentRow > 2) {
 			console.log('hi2');
-
-			return false;
-		}
-
-		// check if pawn is moving backwards
-		if (newRow <= currentRow) {
-			console.log('hi3');
 
 			return false;
 		}
@@ -62,18 +68,27 @@
 		// if (board[newRow][newCol] !== null) {
 		// 	return false;
 		// }
-
-		// valid move
+		// !not valid move attack getting this far is not vaild!
+		//
+		if (attackMove) {
+			return false;
+		}
 		return true;
 	}
 
 	function pawnWtMove(currentPos, newPos) {
 		const [currentRow, currentCol] = currentPos;
 		const [newRow, newCol] = newPos;
+		const checkCol = currentCol - 1 === newCol || currentCol + 1 === newCol;
+		const checkUpDown = newRow - currentRow !== -1;
+		if (newRow >= currentRow) {
+			console.log('hi3');
+			return false;
+		}
 
 		// check if pawn is moving forward
 		if (newCol !== currentCol) {
-			if ((currentCol - 1 === newCol || currentCol + 1 === newCol) && attackMove) {
+			if (checkCol && !checkUpDown && attackMove) {
 				console.log('attack');
 
 				return true;
@@ -92,11 +107,6 @@
 		}
 
 		// check if pawn is moving direction
-		if (newRow >= currentRow) {
-			console.log('hi3');
-
-			return false;
-		}
 
 		// check if pawn is moving two spaces forward on its first move
 		if (currentRow === 6 && newRow === 4) {
@@ -118,7 +128,11 @@
 		// 	return false;
 		// }
 
-		// valid move
+		// !not valid move attack getting this far is not vaild!
+		//
+		if (attackMove) {
+			return false;
+		}
 		return true;
 	}
 	let moveValid = false;
@@ -322,10 +336,14 @@
 		return moveValid;
 	}
 	// export let board;
-	const myKills = [];
-	const theirKills = [];
+
+	let currentPlayer = 'white';
+	let nextPlayer = 'black';
+
 	async function handleDrop(event, row, square) {
 		// Get the piece data from the data transfer object
+		event.preventDefault();
+
 		const [piece, rowIndex, pieceSquare, pieceColor] = event.dataTransfer
 			.getData('text/plain')
 			.split(',');
@@ -342,9 +360,10 @@
 		console.log(newPos);
 		const [color, p] = square.piece.split('-');
 		const [selectedColor, sp] = selectedPiece.piece.split('-');
+
 		if (square.piece === '') {
 			attackMove = false;
-		} else if (color == selectedColor) {
+		} else if (color === selectedColor) {
 			attackMove = false;
 		} else {
 			attackMove = true;
@@ -357,28 +376,33 @@
 
 		// console.log(color);
 		// console.log(p);
+		if (currentPlayer === selectedColor) {
+			if (isValidMove && selectedPiece && (attackMove || square.piece === '')) {
+				// After each move, toggle the current player
+				if (currentPlayer === 'white') {
+					currentPlayer = 'black';
+					nextPlayer = 'white';
+				} else {
+					currentPlayer = 'white';
+					nextPlayer = 'black';
+				}
 
-		if (isValidMove && selectedPiece) {
-			// Update the board state with the new position of the piece
-			if (attackMove) {
+				// Update the board state with the new position of the piece
+				if (attackMove) {
+					const kill = board[rowIndex].piece;
+					myKills.push(kill);
+				}
+
 				board[row].piece = piece;
+				board[rowIndex].piece = '';
 
-				myKills.push(board[rowIndex].piece);
 				attackMove = false;
-
-				if (square.square !== pieceSquare) {
-					board[rowIndex].piece = '';
-				}
-			} else if (square.piece === '') {
-				board[row].piece = piece;
-
-				if (square.square !== pieceSquare) {
-					board[rowIndex].piece = '';
-				}
+			} else {
+				console.log('Cant move there');
 			}
+		} else {
+			console.log('Its not your turn');
 		}
-
-		event.preventDefault();
 	}
 	let handleDragFlag = false;
 	function handleDragOver(event, square) {
@@ -400,6 +424,9 @@
 	<div class="player-name">Player 1</div>
 	<div class="score">{myKills.length}</div>
 </div> -->
+<h2>
+	Its {currentPlayer}'s players turn
+</h2>
 <div class="chess-board">
 	{#each board as square, rowIndex}
 		<div class="chess-row">
@@ -418,18 +445,6 @@
 	{/each}
 </div>
 
-<!-- <div class="score-card">
-	<div class="player-name">Player 2</div>
-	<div class="score">{myKills.length}</div>
-</div>
-
-{#if myKills.length > 0}
-	{#each myKills as kill}
-		<div class="chess-piece">
-			<span class={kill} />
-		</div>
-	{/each}
-{/if} -->
 <style>
 	:global([draggable]) {
 		-webkit-touch-callout: none;
@@ -439,59 +454,6 @@
 		-webkit-user-select: none;
 		-ms-user-select: none;
 		user-select: none;
-	}
-	.score-card {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		background-color: #f2f2f2;
-		padding: 10px;
-		border-radius: 5px;
-		width: 300px;
-		margin-bottom: 10px;
-		border-style: solid;
-		border-width: 4px;
-		border-image: radial-gradient(
-			circle at center,
-			red,
-			orange,
-			yellow,
-			green,
-			blue,
-			indigo,
-			violet,
-			red
-		);
-		animation: gradient-border 10s ease infinite;
-		padding: 20px;
-		border-radius: 10px;
-		box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-	}
-	@keyframes gradient-border {
-		0% {
-			border-image-slice: 1;
-		}
-		25% {
-			border-image-slice: 20;
-		}
-		50% {
-			border-image-slice: 40;
-		}
-		75% {
-			border-image-slice: 60;
-		}
-		100% {
-			border-image-slice: 80;
-		}
-	}
-
-	.player-name {
-		font-weight: bold;
-	}
-
-	.score {
-		font-size: 24px;
 	}
 	.chess-board {
 		display: grid;

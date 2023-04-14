@@ -4,6 +4,8 @@
 	let rows = ['8', '7', '6', '5', '4', '3', '2', '1'];
 	let columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 	let board = [];
+	$: myKills = [];
+	const theirKills = [];
 	let pieces = [
 		{ type: 'rook', color: 'white', position: 'a1' },
 		{ type: 'knight', color: 'white', position: 'b1' },
@@ -51,21 +53,98 @@
 		return color + '-' + type;
 	}
 
-	for (let row of rows) {
-		for (let column of columns) {
-			let squareColor = getSquareColor(row, column);
-			let piece = pieces.find((p) => p.position === column + row);
-			let pieceType = piece ? getPieceType(piece.color, piece.type) : '';
+	function setBoard() {
+		for (let row of rows) {
+			for (let column of columns) {
+				let squareColor = getSquareColor(row, column);
+				let piece = pieces.find((p) => p.position === column + row);
+				let pieceType = piece ? getPieceType(piece.color, piece.type) : '';
 
-			board.push({
-				square: column + row,
-				color: squareColor,
-				piece: pieceType
-			});
+				board.push({
+					square: column + row,
+					color: squareColor,
+					piece: pieceType
+				});
+			}
 		}
 	}
+	setBoard();
 	console.log(board);
 	// let board = [];
 </script>
 
-<ChessBoard {board} />
+<div class="sheet">
+	<div class="score-card">
+		<div class="player-name">Black Player</div>
+		<div class="score">{theirKills.length}</div>
+	</div>
+	<ChessBoard {board} {myKills} />
+	<div class="score-card">
+		<div class="player-name">White Player</div>
+		<div class="score">{myKills.length}</div>
+	</div>
+</div>
+
+<!-- <div>
+	{#if myKills.length > 0}
+		{#each myKills as kill}
+			<div class="chess-piece">
+				<span class={kill} />
+			</div>
+		{/each}
+	{/if}
+</div> -->
+<style>
+	.sheet {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+	}
+	.score-card {
+		display: flex;
+		margin: auto;
+		margin-top: 10px;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		background-color: #f2f2f2;
+		padding: 10px;
+		border-radius: 5px;
+		width: 280px;
+		margin-bottom: 10px;
+		border-style: solid;
+		border-width: 5px;
+		border-image: radial-gradient(circle at center, indigo, blue, indigo, blue, indigo);
+		animation: gradient-border 10s ease infinite;
+		padding: 20px;
+		border-radius: 10px;
+
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+	}
+	@keyframes gradient-border {
+		0% {
+			border-image-slice: 1;
+		}
+		25% {
+			border-image-slice: 15;
+		}
+		50% {
+			border-image-slice: 20;
+		}
+		75% {
+			border-image-slice: 25;
+		}
+		100% {
+			border-image-slice: 35;
+		}
+	}
+
+	.player-name {
+		font-weight: bold;
+	}
+
+	.score {
+		font-size: 24px;
+	}
+</style>
