@@ -1,11 +1,13 @@
 <script lang="ts">
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
 	import ChessPiece from './ChessPiece.svelte';
 	export let board;
 	export let myKills;
-
-	function handleKeyPress(event) {
-		console.log(event);
-	}
+	let newRowIndex;
+	let newLocation;
+	let oldLocation;
+	let touch = false;
 	function getRowAndColumn(square) {
 		const file = square.charAt(0);
 		const rank = parseInt(square.charAt(1), 10) - 1;
@@ -22,8 +24,8 @@
 		const checkCol = currentCol - 1 === newCol || currentCol + 1 === newCol;
 		// const checkRow = currentRow - 1 === newRow || currentRow + 1 === newRow;
 		const checkUpDown = newRow - currentRow !== 1;
-		console.log(checkUpDown);
-		console.log('checkUpDown');
+		// console.log(checkUpDown);
+		// console.log('checkUpDown');
 
 		// is it attacking left to right?
 		if (newRow <= currentRow) {
@@ -117,7 +119,7 @@
 
 		// check if pawn is moving one space forward
 		if (newRow - currentRow !== -1) {
-			console.log(newRow - currentRow);
+			// console.log(newRow - currentRow);
 			console.log('hi5' + (newRow - currentRow));
 
 			return false;
@@ -176,7 +178,7 @@
 		// 		found = false;
 		// 	}
 		// }
-		console.log(found);
+		// console.log(found);
 
 		if (found) {
 			return true;
@@ -339,25 +341,29 @@
 
 	let currentPlayer = 'white';
 	let nextPlayer = 'black';
+	let kills = [];
 
 	async function handleDrop(event, row, square) {
 		// Get the piece data from the data transfer object
-		event.preventDefault();
-
-		const [piece, rowIndex, pieceSquare, pieceColor] = event.dataTransfer
-			.getData('text/plain')
-			.split(',');
-
+		let piece, rowIndex, pieceSquare, pieceColor;
+		if (!touch) {
+			event.preventDefault();
+			[piece, rowIndex, pieceSquare, pieceColor] = event.dataTransfer
+				.getData('text/plain')
+				.split(',');
+		} else {
+			[piece, rowIndex, pieceSquare, pieceColor] = event.split(',');
+		}
 		// is piece a piece?? where you came from
 		const selectedPiece = board.find((piece) => piece.square === pieceSquare);
-		console.log(selectedPiece);
-		console.log('selectedPiece');
+		// console.log(selectedPiece);
+		// console.log('selectedPiece');
 
 		// Check if the move is valid
 		const currentPos = getRowAndColumn(pieceSquare);
 		const newPos = getRowAndColumn(square.square);
-		console.log(currentPos);
-		console.log(newPos);
+		// console.log(currentPos);
+		// console.log(newPos);
 		const [color, p] = square.piece.split('-');
 		const [selectedColor, sp] = selectedPiece.piece.split('-');
 
@@ -372,13 +378,28 @@
 		// validateMove(piece, currentPos, newPos);
 		const isValidMove = validateMove(piece, currentPos, newPos); // moveValid; // true; // checkMove(board, [piecePosition], [row, square.position]);
 		const isAttackValid = attackValid;
-		console.log(isValidMove);
+		// console.log(isValidMove);
 
 		// console.log(color);
 		// console.log(p);
 		if (currentPlayer === selectedColor) {
 			if (isValidMove && selectedPiece && (attackMove || square.piece === '')) {
 				// After each move, toggle the current player
+
+				// Update the board state with the new position of the piece
+				if (attackMove) {
+					const kill = board[rowIndex].piece;
+					kills.push(kill);
+					console.log('killed');
+					console.log(kills);
+					const killBy = currentPlayer;
+					dispatch('kills', { kills, killBy });
+				}
+
+				board[row].piece = piece;
+				board[rowIndex].piece = '';
+				attackMove = false;
+
 				if (currentPlayer === 'white') {
 					currentPlayer = 'black';
 					nextPlayer = 'white';
@@ -386,17 +407,6 @@
 					currentPlayer = 'white';
 					nextPlayer = 'black';
 				}
-
-				// Update the board state with the new position of the piece
-				if (attackMove) {
-					const kill = board[rowIndex].piece;
-					myKills.push(kill);
-				}
-
-				board[row].piece = piece;
-				board[rowIndex].piece = '';
-
-				attackMove = false;
 			} else {
 				console.log('Cant move there');
 			}
@@ -414,8 +424,22 @@
 	}
 
 	function handleChessComponent(event) {
-		console.log(event);
+		// console.log(event);
 		handleDragFlag = event;
+	}
+	function handleChessTouchingEnd(event) {
+		// console.log(event);
+		oldLocation = event.detail.item.oldLocation;
+		newLocation = event.detail.item.newLocation;
+		// console.log(oldLocation);
+		const square = board[newLocation];
+		// console.log(newLocation);
+		// console.log('newLocation');
+
+		// console.log(square);
+
+		touch = true;
+		handleDrop(oldLocation, newLocation, square);
 	}
 </script>
 
@@ -427,16 +451,26 @@
 <h2>
 	Its {currentPlayer}'s players turn
 </h2>
+<!-- kills: {kills.length} -->
 <div class="chess-board">
 	{#each board as square, rowIndex}
-		<div class="chess-row">
+		<div class="chess-row" aria-label={rowIndex.toString()}>
+			<!-- {rowIndex}
+			{square.square} -->
 			<div
 				class="square {square.color}"
 				on:drop={(event) => handleDrop(event, rowIndex, square)}
 				on:dragover={() => handleDragOver(event, square)}
 			>
 				{#if square.piece}
-					<ChessPiece {square} {rowIndex} on:dragger={() => handleChessComponent}>
+					<ChessPiece
+						{square}
+						{rowIndex}
+						{board}
+						{newRowIndex}
+						on:dragger={() => handleChessComponent}
+						on:touchingend={(e) => handleChessTouchingEnd(e)}
+					>
 						<span class={square.piece} />
 					</ChessPiece>
 				{/if}
@@ -492,6 +526,14 @@
 
 	.light {
 		background-color: #eee;
+	}
+
+	.dark:hover {
+		background-color: #41532d;
+	}
+
+	.light:hover {
+		background-color: rgb(99, 98, 98);
 	}
 
 	.white-king:before {

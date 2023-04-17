@@ -1,11 +1,10 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import ChessBoard from './ChessBoard.svelte';
 
 	let rows = ['8', '7', '6', '5', '4', '3', '2', '1'];
 	let columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 	let board = [];
-	$: myKills = [];
-	const theirKills = [];
 	let pieces = [
 		{ type: 'rook', color: 'white', position: 'a1' },
 		{ type: 'knight', color: 'white', position: 'b1' },
@@ -69,24 +68,89 @@
 		}
 	}
 	setBoard();
-	console.log(board);
+
+	// console.log(board);
+
 	// let board = [];
+	let myKills = 0;
+	let theirKills = 0;
+	function handleKill(event) {
+		event.preventDefault();
+		console.log(event);
+		let tempKills;
+		tempKills = event.detail.killBy;
+		if (tempKills === 'white') {
+			myKills = event.detail.kills.length;
+		} else {
+			theirKills = event.detail.kills.length;
+		}
+	}
+	import { spring } from 'svelte/motion';
+
+	const displayed_count = spring();
+	$: displayed_count.set(myKills);
+	const their_displayed_count = spring();
+
+	$: their_displayed_count.set(theirKills);
+
+	$: offset = modulo($displayed_count, 1);
+
+	$: offset2 = modulo($their_displayed_count, 1);
+	function modulo(n: number, m: number) {
+		// handle negative numbers
+		return ((n % m) + m) % m;
+	}
+	onMount(() => {
+		// drop_zone = document.querySelectorAll('.chess-board');
+
+		const squares = document.querySelectorAll('.chess-row');
+
+		// Loop through each square and add its position to the board object
+		squares.forEach((square) => {
+			// Get the position of the square relative to the screen
+			const rect = square.getBoundingClientRect();
+			// console.log(square.getBoundingClientRect());
+
+			// Calculate the top-left corner of the square
+			const x = rect.left + window.pageXOffset;
+			const y = rect.top + window.pageYOffset;
+
+			// Get the row and column of the square
+			const row = square.ariaLabel;
+			// console.log(row);
+			// Add the position to the board object
+			const coordinates = { x, y };
+
+			board[row] = { ...board[row], coordinates };
+		});
+		// console.log(board);
+	});
 </script>
 
 <div class="sheet">
 	<div class="score-card">
 		<div class="player-name">Black Player</div>
-		<div class="score">{theirKills.length}</div>
+		<div class="counter-viewport">
+			<div class="counter-digits" style="transform: translate(0, {100 * offset2}%)">
+				<strong class="hidden" aria-hidden="true">{Math.floor($their_displayed_count + 1)}</strong>
+				<strong>{Math.floor($their_displayed_count)}</strong>
+			</div>
+		</div>
 	</div>
-	<ChessBoard {board} {myKills} />
+	<ChessBoard {board} {myKills} on:kills={(e) => handleKill(e)} />
 	<div class="score-card">
 		<div class="player-name">White Player</div>
-		<div class="score">{myKills.length}</div>
+		<div class="counter-viewport">
+			<div class="counter-digits" style="transform: translate(0, {100 * offset}%)">
+				<strong class="hidden" aria-hidden="true">{Math.floor($displayed_count + 1)}</strong>
+				<strong>{Math.floor($displayed_count)}</strong>
+			</div>
+		</div>
 	</div>
 </div>
 
 <!-- <div>
-	{#if myKills.length > 0}
+	{#if myKills > 0}
 		{#each myKills as kill}
 			<div class="chess-piece">
 				<span class={kill} />
@@ -94,7 +158,38 @@
 		{/each}
 	{/if}
 </div> -->
+
 <style>
+	.counter-viewport {
+		width: 8em;
+		height: 4em;
+		overflow: hidden;
+		text-align: center;
+		position: relative;
+	}
+
+	.counter-viewport strong {
+		position: absolute;
+		display: flex;
+		width: 100%;
+		height: 100%;
+		font-weight: 400;
+		color: var(--color-theme-1);
+		font-size: 4rem;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.counter-digits {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+	}
+
+	.hidden {
+		top: -100%;
+		user-select: none;
+	}
 	.sheet {
 		display: flex;
 		justify-content: center;
