@@ -390,8 +390,8 @@
 				if (attackMove) {
 					const kill = board[rowIndex].piece;
 					kills.push(kill);
-					console.log('killed');
-					console.log(kills);
+					// console.log('killed');
+					// console.log(kills);
 					const killBy = currentPlayer;
 					dispatch('kills', { kills, killBy });
 				}
@@ -449,7 +449,7 @@
 	<div class="score">{myKills.length}</div>
 </div> -->
 <h2>
-	Its {currentPlayer}'s players turn
+	Its player {currentPlayer}'s turn
 </h2>
 <!-- kills: {kills.length} -->
 <div class="chess-board">
@@ -480,7 +480,7 @@
 </div>
 
 <style>
-	:global([draggable]) {
+	/* :global([draggable]) {
 		-webkit-touch-callout: none;
 		-ms-touch-action: none;
 		touch-action: none;
@@ -488,11 +488,12 @@
 		-webkit-user-select: none;
 		-ms-user-select: none;
 		user-select: none;
-	}
+	} */
+
 	.chess-board {
 		display: grid;
-		grid-template-columns: repeat(8, 50px);
-		grid-template-rows: repeat(8, 50px);
+		grid-template-columns: repeat(8, 45px);
+		grid-template-rows: repeat(8, 45px);
 		grid-gap: 0;
 	}
 	.chess-piece {
@@ -512,8 +513,8 @@
 		opacity: 0.5;
 	}
 	.square {
-		width: 50px;
-		height: 50px;
+		width: 45px;
+		height: 45px;
 		display: flex;
 		justify-content: center;
 		align-items: center;

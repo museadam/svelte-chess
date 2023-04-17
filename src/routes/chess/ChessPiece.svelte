@@ -69,13 +69,6 @@
 		return distances[0].coordinates;
 	}
 
-	// function findClosestCoordinates(arr, coords) {
-	// 	const distances = arr.map((point) =>
-	// 		distance(point.coordinates.x, point.coordinates.y, coords.x, coords.y)
-	// 	);
-	// 	const minDistance = Math.min(...distances);
-	// 	return arr[distances.indexOf(minDistance)];
-	// }
 	let dropped = [];
 	let status = '';
 
@@ -99,43 +92,24 @@
 
 		let touchLocation = e.targetTouches[0];
 		// console.log(touchLocation);
-		let pageX = Math.floor(touchLocation.pageX - 50) + 'px';
-		let pageY = Math.floor(touchLocation.pageY - 50) + 'px';
+		let pageX = Math.floor(touchLocation.pageX - 20) + 'px';
+		let pageY = Math.floor(touchLocation.pageY - 60) + 'px';
 		status = 'Touch x ' + pageX + ' Touch y ' + pageY;
 		// console.log(status);
 		e.target.style.position = 'absolute';
 		e.target.style.left = pageX;
 		e.target.style.top = pageY;
-		const x = touchLocation.clientX - 50;
-		const y = touchLocation.clientY - 50;
+		const x = touchLocation.clientX - 20;
+		const y = touchLocation.clientY - 60;
 		const currentLocation = {
 			x,
 			y
 		};
 		activeEvent = 'move';
-		// is it over a square? compare locations
-		// console.log(drop_zone);
-		// const rows = drop_zone.querySelectorAll('.chess-row');
 		const rows = board;
-		// console.log(currentLocation);
-
-		// console.log(drop_zone.querySelectorAll('.chess-row'));
 		const getLocation = findClosestCoordinates(currentLocation, rows);
-		// console.log(getLocation);
 		boardRowIndex = board.indexOf(getLocation);
-		// console.log(boardRowIndex);
 		newRowIndex = boardRowIndex;
-		// rows.forEach((el) => {
-		// 	const location = el.coordinates; // el.getBoundingClientRect();
-		// 	// console.log(location);
-		// 	if (location.x === currentLocation.pageX && location.y === currentLocation.pageY) {
-		// 		console.log(location.x);
-		// 		console.log(location.y);
-
-		// 		console.log(currentLocation.pageX);
-		// 		console.log(currentLocation.pageY);
-		// 	}
-		// });
 	}
 
 	// handles drop

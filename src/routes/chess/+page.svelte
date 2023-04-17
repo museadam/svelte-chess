@@ -175,9 +175,9 @@
 		height: 100%;
 		font-weight: 400;
 		color: var(--color-theme-1);
-		font-size: 4rem;
+		font-size: 2rem;
 		align-items: center;
-		justify-content: center;
+		justify-content: end;
 	}
 
 	.counter-digits {
@@ -198,23 +198,18 @@
 	}
 	.score-card {
 		display: flex;
-		margin: auto;
 		margin-top: 10px;
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
 		background-color: #f2f2f2;
-		padding: 10px;
-		border-radius: 5px;
 		width: 280px;
-		margin-bottom: 10px;
+		padding-right: 10px;
+		padding-left: 10px;
 		border-style: solid;
-		border-width: 5px;
 		border-image: radial-gradient(circle at center, indigo, blue, indigo, blue, indigo);
 		animation: gradient-border 10s ease infinite;
-		padding: 20px;
 		border-radius: 10px;
-
 		box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 	}
 	@keyframes gradient-border {
@@ -237,9 +232,5 @@
 
 	.player-name {
 		font-weight: bold;
-	}
-
-	.score {
-		font-size: 24px;
 	}
 </style>
