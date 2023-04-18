@@ -51,7 +51,7 @@
 	function getPieceType(color, type) {
 		return color + '-' + type;
 	}
-
+	let startBoard = [];
 	function setBoard() {
 		for (let row of rows) {
 			for (let column of columns) {
@@ -64,9 +64,12 @@
 					color: squareColor,
 					piece: pieceType
 				});
+				startBoard = [...board];
+				startBoard = startBoard;
 			}
 		}
 	}
+	// $: startBoard = board;
 	setBoard();
 
 	// console.log(board);
@@ -90,6 +93,10 @@
 			theirKillsArr.push(event.detail.kill);
 			theirKills += 1;
 		}
+		if (event.detail.kill === 'white-king' || event.detail.kill === 'black-king') {
+			alert('YOU WIN!');
+			board = startBoard;
+		}
 	}
 	import { spring } from 'svelte/motion';
 
@@ -105,6 +112,12 @@
 	function modulo(n: number, m: number) {
 		// handle negative numbers
 		return ((n % m) + m) % m;
+	}
+	function restartGame() {
+		// board = [];
+		// setBoard();
+		console.log(startBoard);
+		board = startBoard;
 	}
 	onMount(() => {
 		// drop_zone = document.querySelectorAll('.chess-board');
@@ -134,7 +147,9 @@
 </script>
 
 <div class="sheet">
-	<div class="score-card">
+	<button class="btn gradient-border" on:click={restartGame}> Restart </button>
+
+	<div class="gradient-border score-card">
 		<div class="player-name">Black Player</div>
 		<div class="counter-viewport">
 			<div class="counter-digits" style="transform: translate(0, {100 * offset2}%)">
@@ -144,7 +159,7 @@
 		</div>
 	</div>
 	<ChessBoard {board} {myKills} on:kills={(e) => handleKill(e)} />
-	<div class="score-card">
+	<div class="gradient-border score-card">
 		<div class="player-name">White Player</div>
 		<div class="counter-viewport">
 			<div class="counter-digits" style="transform: translate(0, {100 * offset}%)">
@@ -166,6 +181,23 @@
 </div> -->
 
 <style>
+	.btn {
+		all: unset;
+		display: flex;
+		width: 210px;
+		height: 40px;
+		align-items: center;
+		justify-content: center;
+		font-size: 2rem;
+		font-weight: 400;
+		background-color: #f2f2f2;
+		cursor: pointer;
+	}
+
+	.btn:active {
+		width: 200px;
+		height: 30px;
+	}
 	.counter-viewport {
 		width: 8em;
 		height: 4em;
@@ -209,33 +241,51 @@
 		justify-content: space-between;
 		align-items: center;
 		background-color: #f2f2f2;
-		width: 280px;
 		padding-right: 10px;
 		padding-left: 10px;
-		border-style: solid;
-		border-image: radial-gradient(circle at center, indigo, blue, indigo, blue, indigo);
-		animation: gradient-border 10s ease infinite;
-		border-radius: 10px;
-		box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+		width: 210px;
+		height: 80px;
 	}
-	@keyframes gradient-border {
-		0% {
-			border-image-slice: 1;
-		}
-		25% {
-			border-image-slice: 15;
-		}
-		50% {
-			border-image-slice: 20;
-		}
-		75% {
-			border-image-slice: 25;
-		}
-		100% {
-			border-image-slice: 35;
-		}
+	.gradient-border {
+		--borderWidth: 3px;
+		position: relative;
+		border-radius: var(--borderWidth);
+	}
+	.gradient-border:after {
+		content: '';
+		position: absolute;
+		top: calc(-1 * var(--borderWidth));
+		left: calc(-1 * var(--borderWidth));
+		height: calc(100% + var(--borderWidth) * 2);
+		width: calc(100% + var(--borderWidth) * 2);
+		background: linear-gradient(
+			60deg,
+			#f79533,
+			#f37055,
+			#ef4e7b,
+			#a166ab,
+			#5073b8,
+			#1098ad,
+			#07b39b,
+			#6fba82
+		);
+		border-radius: calc(2 * var(--borderWidth));
+		z-index: -1;
+		animation: animated-gradient 3s ease alternate infinite;
+		background-size: 300% 300%;
 	}
 
+	@keyframes animated-gradient {
+		0% {
+			background-position: 0% 50%;
+		}
+		50% {
+			background-position: 100% 50%;
+		}
+		100% {
+			background-position: 0% 50%;
+		}
+	}
 	.player-name {
 		font-weight: bold;
 	}

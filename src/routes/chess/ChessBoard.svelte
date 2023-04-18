@@ -388,7 +388,7 @@
 
 				// Update the board state with the new position of the piece
 				if (attackMove) {
-					const kill = board[rowIndex].piece;
+					const kill = board[row].piece;
 					// kills.push(kill);
 					// console.log('killed');
 					// console.log(kills);
