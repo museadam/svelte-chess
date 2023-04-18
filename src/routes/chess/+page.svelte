@@ -73,16 +73,22 @@
 
 	// let board = [];
 	let myKills = 0;
+	let myKillsArr = [];
+
 	let theirKills = 0;
+	let theirKillsArr = [];
+
 	function handleKill(event) {
 		event.preventDefault();
 		console.log(event);
 		let tempKills;
 		tempKills = event.detail.killBy;
 		if (tempKills === 'white') {
-			myKills = event.detail.kills.length;
+			myKillsArr.push(event.detail.kill);
+			myKills += 1;
 		} else {
-			theirKills = event.detail.kills.length;
+			theirKillsArr.push(event.detail.kill);
+			theirKills += 1;
 		}
 	}
 	import { spring } from 'svelte/motion';

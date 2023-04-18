@@ -389,11 +389,11 @@
 				// Update the board state with the new position of the piece
 				if (attackMove) {
 					const kill = board[rowIndex].piece;
-					kills.push(kill);
+					// kills.push(kill);
 					// console.log('killed');
 					// console.log(kills);
 					const killBy = currentPlayer;
-					dispatch('kills', { kills, killBy });
+					dispatch('kills', { kill, killBy });
 				}
 
 				board[row].piece = piece;
@@ -492,14 +492,14 @@
 
 	.chess-board {
 		display: grid;
-		grid-template-columns: repeat(8, 45px);
-		grid-template-rows: repeat(8, 45px);
+		grid-template-columns: repeat(8, 40px);
+		grid-template-rows: repeat(8, 40px);
 		grid-gap: 0;
 	}
 	.chess-piece {
 		position: absolute;
-		width: 60px;
-		height: 60px;
+		width: 40px;
+		height: 40px;
 		user-select: none;
 		z-index: 10;
 		pointer-events: none;
@@ -513,12 +513,12 @@
 		opacity: 0.5;
 	}
 	.square {
-		width: 45px;
-		height: 45px;
+		width: 40px;
+		height: 40px;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		font-size: 40px;
+		font-size: 30px;
 	}
 
 	.dark {
