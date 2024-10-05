@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import ChessBoard from './ChessBoard.svelte';
+	import type { SquareOnBoard } from '$types/board.ts';
 
 	let rows = ['8', '7', '6', '5', '4', '3', '2', '1'];
 	let columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-	let board = [];
-	let pieces = [
+	let board: SquareOnBoard[] = [];
+	let pieces: SquareOnBoard[] = [
 		{ type: 'rook', color: 'white', position: 'a1' },
 		{ type: 'knight', color: 'white', position: 'b1' },
 		{ type: 'bishop', color: 'white', position: 'c1' },
@@ -40,7 +41,7 @@
 		{ type: 'pawn', color: 'black', position: 'h7' }
 	];
 
-	function getSquareColor(row, column) {
+	function getSquareColor(row: string, column: string) {
 		if ((columns.indexOf(column) + rows.indexOf(row)) % 2 === 0) {
 			return 'light';
 		} else {
@@ -48,10 +49,10 @@
 		}
 	}
 
-	function getPieceType(color, type) {
+	function getPieceType(color: string, type: string) {
 		return color + '-' + type;
 	}
-	let startBoard = [];
+	let startBoard: SquareOnBoard[] = [];
 	function setBoard() {
 		for (let row of rows) {
 			for (let column of columns) {
@@ -135,7 +136,7 @@
 			const y = rect.top + window.pageYOffset;
 
 			// Get the row and column of the square
-			const row = square.ariaLabel;
+			const row: string | null = square.ariaLabel;
 			// console.log(row);
 			// Add the position to the board object
 			const coordinates = { x, y };

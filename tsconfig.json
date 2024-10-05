@@ -9,7 +9,20 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true
-	}
+	},
+	"include": [
+		"tailwind.config.ts",
+		"./src/**/*.js",
+		"./types/**/*.ts",
+		"./src/**/*.svelte",
+		"./src/**/*.ts",
+		"./tests/*.ts"
+	],
+	"exclude": [
+		"node_modules/**",
+		"./.sveltekit/**",
+		"build/**"
+	]
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	//
 	// If you want to overwrite includes/excludes, make sure to copy over the relevant includes/excludes

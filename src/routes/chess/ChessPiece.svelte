@@ -1,8 +1,10 @@
-<script>
-	export let square;
-	export let rowIndex;
+<script lang="ts">
+	export let rowIndex: ;
 	export let newRowIndex;
-	export let board;
+	import type { SquareOnBoard } from '$types/board';
+	export let square: SquareOnBoard;
+
+	export let board: SquareOnBoard[];
 
 	// export let column;
 	import { createEventDispatcher } from 'svelte';
@@ -85,7 +87,7 @@
 		originalY = e.target.offsetTop - 10 + 'px';
 		activeEvent = 'start';
 	}
-	let boardRowIndex;
+	let boardRowIndex: number;
 	// this is determining the new location
 	function handleTouchMove(e) {
 		// console.log(e);
