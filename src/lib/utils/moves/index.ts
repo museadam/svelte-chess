@@ -1,15 +1,15 @@
 import type { SquareOnBoard } from '$types/board.ts';
 
-export function getRowAndColumn(square: SquareOnBoard) {
+function getRowAndColumn(square: SquareOnBoard) {
     const file = square.charAt(0);
     const rank = parseInt(square.charAt(1), 10) - 1;
     const column = file.charCodeAt(0) - 97;
     const row = 7 - rank;
     return [row, column];
 }
-export let attackMove = false;
+let attackMove = false;
 
-export function pawnBlkMove(currentPos: number[], newPos: number[]) {
+function pawnBlkMove(currentPos: number[], newPos: number[]) {
     const [currentRow, currentCol] = currentPos;
     const [newRow, newCol] = newPos;
 
@@ -70,7 +70,7 @@ export function pawnBlkMove(currentPos: number[], newPos: number[]) {
     return true;
 }
 
-export function pawnWtMove(currentPos: number[], newPos: number[]) {
+function pawnWtMove(currentPos: number[], newPos: number[]) {
     const [currentRow, currentCol] = currentPos;
     const [newRow, newCol] = newPos;
     const checkCol = currentCol - 1 === newCol || currentCol + 1 === newCol;
@@ -130,7 +130,7 @@ export function pawnWtMove(currentPos: number[], newPos: number[]) {
     return true;
 }
 
-export function getValidMovesForRook(position: number[], newPos: number[]) {
+function getValidMovesForRook(position: number[], newPos: number[]) {
     const file = position[0];
     const rank = position[1];
     const validMoves = [];
@@ -177,7 +177,7 @@ export function getValidMovesForRook(position: number[], newPos: number[]) {
         return false;
     }
 }
-export function getValidMovesForBishop(position: number[], newPos: number[]) {
+function getValidMovesForBishop(position: number[], newPos: number[]) {
     const validMoves = [];
     // The bishop can move diagonally in any direction, so we need to check all diagonal lines
     for (let i = -7; i <= 7; i++) {
@@ -212,7 +212,7 @@ export function getValidMovesForBishop(position: number[], newPos: number[]) {
     }
 }
 
-export function getValidMovesKnight(position: number[], newPos: number[]) {
+function getValidMovesKnight(position: number[], newPos: number[]) {
     const moves = [];
     const [x, y] = position;
     const potentialMoves = [
@@ -248,7 +248,7 @@ export function getValidMovesKnight(position: number[], newPos: number[]) {
     }
 }
 
-export function kingMove(currentPos: number[], newPos: number[]) {
+function kingMove(currentPos: number[], newPos: number[]) {
     const [currentRow, currentCol] = currentPos;
     const [newRow, newCol] = newPos;
 

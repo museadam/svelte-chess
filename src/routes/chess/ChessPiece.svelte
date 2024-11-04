@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let rowIndex: ;
+	export let rowIndex: number;
 	export let newRowIndex;
 	import type { SquareOnBoard } from '$types/board';
 	export let square: SquareOnBoard;
