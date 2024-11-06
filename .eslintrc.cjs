@@ -1,20 +1,32 @@
-module.exports = {
-	root: true,
-	parser: '@typescript-eslint/parser',
-	extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
-	plugins: ['svelte3', '@typescript-eslint'],
-	ignorePatterns: ['*.cjs'],
-	overrides: [{ files: ['*.svelte'], processor: 'svelte3/svelte3' }],
-	settings: {
-		'svelte3/typescript': () => require('typescript')
+import eslint from '@eslint/js';
+import prettier from 'eslint-config-prettier';
+import svelte from 'eslint-plugin-svelte';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
+
+export default tseslint.config(
+	eslint.configs.recommended,
+	...tseslint.configs.recommended,
+	...svelte.configs['flat/recommended'],
+	prettier,
+	...svelte.configs['flat/prettier'],
+	{
+		languageOptions: {
+			globals: {
+				...globals.browser,
+				...globals.node
+			}
+		}
 	},
-	parserOptions: {
-		sourceType: 'module',
-		ecmaVersion: 2020
+	{
+		files: ['**/*.svelte'],
+		languageOptions: {
+			parserOptions: {
+				parser: tseslint.parser
+			}
+		}
 	},
-	env: {
-		browser: true,
-		es2017: true,
-		node: true
+	{
+		ignores: ['build/', '.svelte-kit/', 'dist/']
 	}
-};
+);

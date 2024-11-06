@@ -14,7 +14,7 @@
 	// 	kingMove
 	// } from '$lib/utils/moves';
 	export let board: SquareOnBoard[];
-	export let myKills;
+	// export let myKills;
 	let newRowIndex: string;
 	let newLocation;
 	let oldLocation;
@@ -24,280 +24,338 @@
 
 	// import type { SquareOnBoard } from '$types/board.ts';
 
- function getRowAndColumn(square: SquareOnBoard) {
-    const file = square.charAt(0);
-    const rank = parseInt(square.charAt(1), 10) - 1;
-    const column = file.charCodeAt(0) - 97;
-    const row = 7 - rank;
-    return [row, column];
-}
- let attackMove = false;
+	function getRowAndColumn(square: string): number[] {
+		const file = square.charAt(0);
+		const rank = parseInt(square.charAt(1), 10) - 1;
+		const column = file.charCodeAt(0) - 97;
+		const row = 7 - rank;
+		return [row, column];
+	}
+	function getSquareFromRC(square: number[]): string {
+		const [row, column] = square;
+		const file = String.fromCharCode(column + 97); // Convert column to file letter (a-h)
+		const rank = 8 - row; // Convert row to rank number (1-8)
+		return `${file}${rank}`;
+	}
+	let attackMove = false;
 
- function pawnBlkMove(currentPos: number[], newPos: number[]) {
-    const [currentRow, currentCol] = currentPos;
-    const [newRow, newCol] = newPos;
+	function pawnBlkMove(currentPos: number[], newPos: number[]) {
+		const [currentRow, currentCol] = currentPos;
+		const [newRow, newCol] = newPos;
 
-    const checkCol = currentCol - 1 === newCol || currentCol + 1 === newCol;
-    // const checkRow = currentRow - 1 === newRow || currentRow + 1 === newRow;
-    const checkUpDown = newRow - currentRow !== 1;
-    // console.log(checkUpDown);
-    // console.log('checkUpDown');
+		const checkCol = currentCol - 1 === newCol || currentCol + 1 === newCol;
+		// const checkRow = currentRow - 1 === newRow || currentRow + 1 === newRow;
+		const checkUpDown = newRow - currentRow !== 1;
+		// console.log(checkUpDown);
+		// console.log('checkUpDown');
 
-    // is it attacking left to right?
-    if (newRow <= currentRow) {
-        console.log('hi3');
-        return false;
-    }
-    // check if pawn is moving forward
-    if (newCol !== currentCol) {
-        if (checkCol && !checkUpDown && attackMove) {
-            console.log('attack');
+		// is it attacking left to right?
+		if (newRow <= currentRow) {
+			console.log('hi3');
+			return false;
+		}
+		// check if pawn is moving forward
+		if (newCol !== currentCol) {
+			if (checkCol && !checkUpDown && attackMove) {
+				console.log('attack');
 
-            return true;
-        } else {
-            console.log('hi1 move false');
+				return true;
+			} else {
+				console.log('hi1 move false');
 
-            return false;
-        }
-    }
+				return false;
+			}
+		}
 
-    // check if pawn is moving more than one space forward
-    if (newRow - currentRow > 2) {
-        console.log('hi2');
+		// check if pawn is moving more than one space forward
+		if (newRow - currentRow > 2) {
+			console.log('hi2');
 
-        return false;
-    }
+			return false;
+		}
 
-    // check if pawn is moving two spaces forward on its first move
-    if (currentRow === 1 && newRow === 3) {
-        console.log('hi4');
+		// check if pawn is moving two spaces forward on its first move
+		if (currentRow === 1 && newRow === 3) {
+			console.log('hi4');
 
-        return true;
-    }
-    // check if pawn is moving one space forward
-    if (newRow - currentRow !== 1) {
-        console.log('hi5' + (newRow - currentRow));
+			return true;
+		}
+		// check if pawn is moving one space forward
+		if (newRow - currentRow !== 1) {
+			console.log('hi5' + (newRow - currentRow));
 
-        return false;
-    }
-    console.log(newRow - currentRow);
+			return false;
+		}
+		console.log(newRow - currentRow);
 
-    // check if there is a piece blocking the pawn's path
-    // if (board[newRow][newCol] !== null) {
-    // 	return false;
-    // }
-    // !not valid move attack getting this far is not vaild!
-    //
-    if (attackMove) {
-        return false;
-    }
-    return true;
-}
+		// check if there is a piece blocking the pawn's path
+		// if (board[newRow][newCol] !== null) {
+		// 	return false;
+		// }
+		// !not valid move attack getting this far is not vaild!
+		//
+		if (attackMove) {
+			return false;
+		}
+		return true;
+	}
 
- function pawnWtMove(currentPos: number[], newPos: number[]) {
-    const [currentRow, currentCol] = currentPos;
-    const [newRow, newCol] = newPos;
-    const checkCol = currentCol - 1 === newCol || currentCol + 1 === newCol;
-    const checkUpDown = newRow - currentRow !== -1;
-    if (newRow >= currentRow) {
-        console.log('hi3');
-        return false;
-    }
+	function pawnWtMove(currentPos: number[], newPos: number[]) {
+		const [currentRow, currentCol] = currentPos;
+		const [newRow, newCol] = newPos;
+		const checkCol = currentCol - 1 === newCol || currentCol + 1 === newCol;
+		const checkUpDown = newRow - currentRow !== -1;
+		if (newRow >= currentRow) {
+			console.log('hi3');
+			return false;
+		}
 
-    // check if pawn is moving forward
-    if (newCol !== currentCol) {
-        if (checkCol && !checkUpDown && attackMove) {
-            console.log('attack');
+		// check if pawn is moving forward
+		if (newCol !== currentCol) {
+			if (checkCol && !checkUpDown && attackMove) {
+				console.log('attack');
 
-            return true;
-        } else {
-            console.log('hi1 move false');
+				return true;
+			} else {
+				console.log('hi1 move false');
 
-            return false;
-        }
-    }
+				return false;
+			}
+		}
 
-    // check if pawn is moving more than one space forwards
-    if (newRow - currentRow > 2) {
-        console.log('hi2');
+		// check if pawn is moving more than one space forwards
+		if (newRow - currentRow > 2) {
+			console.log('hi2');
 
-        return false;
-    }
+			return false;
+		}
 
-    // check if pawn is moving direction
+		// check if pawn is moving direction
 
-    // check if pawn is moving two spaces forward on its first move
-    if (currentRow === 6 && newRow === 4) {
-        console.log('hi4');
+		// check if pawn is moving two spaces forward on its first move
+		if (currentRow === 6 && newRow === 4) {
+			console.log('hi4');
 
-        return true;
-    }
+			return true;
+		}
 
-    // check if pawn is moving one space forward
-    if (newRow - currentRow !== -1) {
-        // console.log(newRow - currentRow);
-        console.log('hi5' + (newRow - currentRow));
+		// check if pawn is moving one space forward
+		if (newRow - currentRow !== -1) {
+			// console.log(newRow - currentRow);
+			console.log('hi5' + (newRow - currentRow));
 
-        return false;
-    }
+			return false;
+		}
 
-    // check if there is a piece blocking the pawn's path
-    // if (board[newRow][newCol] !== null) {
-    // 	return false;
-    // }
+		// check if there is a piece blocking the pawn's path
+		// if (board[newRow][newCol] !== null) {
+		// 	return false;
+		// }
 
-    // !not valid move attack getting this far is not vaild!
-    //
-    if (attackMove) {
-        return false;
-    }
-    return true;
-}
+		// !not valid move attack getting this far is not vaild!
+		//
+		if (attackMove) {
+			return false;
+		}
+		return true;
+	}
 
- function getValidMovesForRook(position: number[], newPos: number[]) {
-    const file = position[0];
-    const rank = position[1];
-    const validMoves = [];
+	function getPathBetweenPositions(start: number[], end: number[], moves: number[][]) {
+		const path = [];
+		const [startRow, startCol] = start;
+		const [endRow, endCol] = end;
 
-    // check horizontal moves
-    for (let i = 0; i < 8; i++) {
-        if (i !== file) {
-            const row = i;
-            validMoves.push([row, rank]);
-        }
-    }
+		// Determine direction of movement
+		const rowDirection = Math.sign(endRow - startRow);
+		const colDirection = Math.sign(endCol - startCol);
 
-    // check vertical moves
-    for (let i = 0; i <= 8; i++) {
-        if (i !== rank) {
-            const row = file;
-            const col = i;
-            validMoves.push([row, col]);
-        }
-    }
-    const matrix = validMoves;
-    const search = newPos;
+		// Traverse path
+		let currentRow = startRow + rowDirection;
+		let currentCol = startCol + colDirection;
 
-    // console.log(matrix);
+		// Add each intermediate position until reaching `end`
+		while (currentRow !== endRow || currentCol !== endCol) {
+			if (moves.some(([r, c]) => r === currentRow && c === currentCol)) {
+				path.push([currentRow, currentCol]);
+			}
+			currentRow += rowDirection;
+			currentCol += colDirection;
+		}
 
-    // console.log(search);
-    const found = matrix.some((arr) => arr.every((val, i) => val === search[i]));
-    // let found;
-    // for (let i = 0; i < validMoves.length; i++) {
-    // 	console.log(search);
-    // 	console.log(validMoves[i]);
+		return path;
+	}
 
-    // 	if (validMoves[i] === newPos) {
-    // 		found = true;
-    // 	} else {
-    // 		found = false;
-    // 	}
-    // }
-    // console.log(found);
+	function getValidMovesForRook(position: number[], newPos: number[]) {
+		// const rowI = row;
+		const file = position[0];
+		const rank = position[1];
+		const validMoves = [];
+		const search = newPos;
 
-    if (found) {
-        return true;
-    } else {
-        return false;
-    }
-}
- function getValidMovesForBishop(position: number[], newPos: number[]) {
-    const validMoves = [];
-    // The bishop can move diagonally in any direction, so we need to check all diagonal lines
-    for (let i = -7; i <= 7; i++) {
-        // Ignore moves that don't actually move the bishop
-        if (i === 0) {
-            continue;
-        }
+		// check horizontal moves
+		for (let i = 0; i < 8; i++) {
+			if (i !== file) {
+				const row = i;
+				validMoves.push([row, rank]);
+			}
+		}
 
-        // Check the diagonal line that goes from top-left to bottom-right
-        let row = position[0] + i;
-        let col = position[1] + i;
-        if (row >= 0 && row <= 7 && col >= 0 && col <= 7) {
-            validMoves.push([row, col]);
-        }
+		// check vertical moves
+		for (let i = 0; i <= 8; i++) {
+			if (i !== rank) {
+				const row = file;
+				const col = i;
+				validMoves.push([row, col]);
+			}
+		}
 
-        // Check the diagonal line that goes from top-right to bottom-left
-        row = position[0] + i;
-        col = position[1] - i;
-        if (row >= 0 && row <= 7 && col >= 0 && col <= 7) {
-            validMoves.push([row, col]);
-        }
-    }
-    const search = newPos;
-    const matrix = validMoves;
+		// console.log(matrix);
 
-    const found = matrix.some((arr) => arr.every((val, i) => val === search[i]));
+		// console.log(search);
 
-    if (found) {
-        return true;
-    } else {
-        return false;
-    }
-}
+		let found = validMoves.some((arr) => arr.every((val, i) => val === search[i]));
 
- function getValidMovesKnight(position: number[], newPos: number[]) {
-    const moves = [];
-    const [x, y] = position;
-    const potentialMoves = [
-        [x + 2, y + 1],
-        [x + 2, y - 1],
-        [x - 2, y + 1],
-        [x - 2, y - 1],
-        [x + 1, y + 2],
-        [x + 1, y - 2],
-        [x - 1, y + 2],
-        [x - 1, y - 2]
-    ];
+		const getBetween = getPathBetweenPositions(position, newPos, validMoves);
+		console.log(getBetween);
+		// is there a piece in the po
+		// get squares between moves
+		let spaceFree = true;
+		for (let i = 0; i < getBetween.length; i++) {
+			const getSquare = getSquareFromRC(getBetween[i]);
+			const boardDetail = board.filter((el) => el.square === getSquare)[0];
+			if (boardDetail.piece !== '') {
+				spaceFree = false;
+			}
+		}
+		// let found;
+		// for (let i = 0; i < validMoves.length; i++) {
+		// 	console.log(search);
+		// 	console.log(validMoves[i]);
 
-    for (let i = 0; i < potentialMoves.length; i++) {
-        const [nextX, nextY] = potentialMoves[i];
-        if (nextX < 0 || nextX > 7 || nextY < 0 || nextY > 7) {
-            continue; // Skip invalid moves that go off the board
-        }
-        moves.push([nextX, nextY]);
-    }
+		// 	if (validMoves[i] === newPos) {
+		// 		found = true;
+		// 	} else {
+		// 		found = false;
+		// 	}
+		// }
+		// console.log(found);
 
-    const search = newPos;
-    const matrix = moves;
-    // console.log(search);
-    // console.log(moves);
+		if (found && spaceFree) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	function getValidMovesForBishop(position: number[], newPos: number[]) {
+		const validMoves = [];
+		const search = newPos;
+		console.log(search);
+		let found = false;
+		// The bishop can move diagonally in any direction, so we need to check all diagonal lines
+		for (let i = -7; i <= 7; i++) {
+			// Ignore moves that don't actually move the bishop
+			if (i === 0) {
+				continue;
+			}
 
-    const found = matrix.some((arr) => arr.every((val, i) => val === search[i]));
+			// Check the diagonal line that goes from top-left to bottom-right
+			let row = position[0] + i;
+			let col = position[1] + i;
+			if (row >= 0 && row <= 7 && col >= 0 && col <= 7) {
+				validMoves.push([row, col]);
+			}
 
-    if (found) {
-        return true;
-    } else {
-        return false;
-    }
-}
+			// Check the diagonal line that goes from top-right to bottom-left
+			row = position[0] + i;
+			col = position[1] - i;
+			if (row >= 0 && row <= 7 && col >= 0 && col <= 7) {
+				validMoves.push([row, col]);
+			}
+		}
+		found = validMoves.some((arr) => arr.every((val, i) => val === search[i]));
+		console.log(validMoves);
+		console.log('validMoves');
+		const getBetween = getPathBetweenPositions(position, newPos, validMoves);
+		console.log(getBetween);
+		// is there a piece in the po
+		// get squares between moves
+		let spaceFree = true;
+		for (let i = 0; i < getBetween.length; i++) {
+			const getSquare = getSquareFromRC(getBetween[i]);
+			const boardDetail = board.filter((el) => el.square === getSquare)[0];
+			if (boardDetail.piece !== '') {
+				spaceFree = false;
+			}
+		}
+		// const foundOther = matrix.some((arr) => arr.every((val, i) => val === search[i]));
 
- function kingMove(currentPos: number[], newPos: number[]) {
-    const [currentRow, currentCol] = currentPos;
-    const [newRow, newCol] = newPos;
+		if (found && spaceFree) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
-    if (newRow - currentRow > 1) {
-        console.log('row check');
+	function getValidMovesKnight(position: number[], newPos: number[]) {
+		const moves = [];
+		const [x, y] = position;
+		const potentialMoves = [
+			[x + 2, y + 1],
+			[x + 2, y - 1],
+			[x - 2, y + 1],
+			[x - 2, y - 1],
+			[x + 1, y + 2],
+			[x + 1, y - 2],
+			[x - 1, y + 2],
+			[x - 1, y - 2]
+		];
 
-        return false;
-    }
-    if (newCol - currentCol > 1) {
-        console.log('col check');
+		for (let i = 0; i < potentialMoves.length; i++) {
+			const [nextX, nextY] = potentialMoves[i];
+			if (nextX < 0 || nextX > 7 || nextY < 0 || nextY > 7) {
+				continue; // Skip invalid moves that go off the board
+			}
+			moves.push([nextX, nextY]);
+		}
 
-        return false;
-    }
-    if (currentRow - newRow > 1) {
-        console.log('row check');
+		const search = newPos;
+		const matrix = moves;
 
-        return false;
-    }
-    if (currentCol - newCol > 1) {
-        console.log('col check');
+		const found = matrix.some((arr) => arr.every((val, i) => val === search[i]));
 
-        return false;
-    }
-    return true;
-}
+		if (found) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	function kingMove(currentPos: number[], newPos: number[]) {
+		const [currentRow, currentCol] = currentPos;
+		const [newRow, newCol] = newPos;
+
+		if (newRow - currentRow > 1) {
+			console.log('row check');
+
+			return false;
+		}
+		if (newCol - currentCol > 1) {
+			console.log('col check');
+
+			return false;
+		}
+		if (currentRow - newRow > 1) {
+			console.log('row check');
+
+			return false;
+		}
+		if (currentCol - newCol > 1) {
+			console.log('col check');
+
+			return false;
+		}
+		return true;
+	}
 
 	function validateMove(piece: string, currentPos: number[], newPos: number[]) {
 		// const moves = [];
@@ -359,7 +417,7 @@
 	let nextPlayer = 'black';
 	let kills = [];
 
-	async function handleDrop(event, row: string, square: SquareOnBoard) {
+	async function handleDrop(event, row: number, square: SquareOnBoard) {
 		// Get the piece data from the data transfer object
 		let piece, rowIndex, pieceSquare, pieceColor;
 		if (!touch) {
@@ -372,14 +430,15 @@
 		}
 		// is piece a piece?? where you came from
 		const selectedPiece = board.find((piece) => piece.square === pieceSquare);
-		// console.log(selectedPiece);
-		// console.log('selectedPiece');
+		console.log(board);
+		console.log('board');
 
 		// Check if the move is valid
+		console.log(square.square);
+		console.log('square.square');
 		const currentPos = getRowAndColumn(pieceSquare);
 		const newPos = getRowAndColumn(square.square);
-		// console.log(currentPos);
-		// console.log(newPos);
+
 		const [color, p] = square.piece.split('-');
 		const [selectedColor, sp] = selectedPiece.piece.split('-');
 
@@ -474,6 +533,7 @@
 			<!-- {rowIndex}
 			{square.square} -->
 			<div
+				role="application"
 				class="square {square.color}"
 				on:drop={(event) => handleDrop(event, rowIndex, square)}
 				on:dragover={(event) => handleDragOver(event, square)}

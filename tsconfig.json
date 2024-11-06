@@ -12,11 +12,14 @@
 	},
 	"include": [
 		"tailwind.config.ts",
+		"./assets/**/*.js",
+		"./assets/**/*.ts",
 		"./src/**/*.js",
 		"./types/**/*.ts",
 		"./src/**/*.svelte",
 		"./src/**/*.ts",
-		"./tests/*.ts"
+		"./tests/*.ts",
+		"./tests/**/*.ts",
 	],
 	"exclude": [
 		"node_modules/**",
