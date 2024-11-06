@@ -1,11 +1,13 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { onMount } from 'svelte';
 	import ChessBoard from './ChessBoard.svelte';
 	import type { SquareOnBoard } from '$types/board.ts';
 
 	let rows = ['8', '7', '6', '5', '4', '3', '2', '1'];
 	let columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-	let board: SquareOnBoard[] = [];
+	let board: SquareOnBoard[] = $state([]);
 	let pieces: SquareOnBoard[] = [
 		{ type: 'rook', color: 'white', position: 'a1' },
 		{ type: 'knight', color: 'white', position: 'b1' },
@@ -76,10 +78,10 @@
 	// console.log(board);
 
 	// let board = [];
-	let myKills = 0;
+	let myKills = $state(0);
 	let myKillsArr = [];
 
-	let theirKills = 0;
+	let theirKills = $state(0);
 	let theirKillsArr = [];
 
 	function handleKill(event) {
@@ -102,14 +104,10 @@
 	import { spring } from 'svelte/motion';
 
 	const displayed_count = spring();
-	$: displayed_count.set(myKills);
 	const their_displayed_count = spring();
 
-	$: their_displayed_count.set(theirKills);
 
-	$: offset = modulo($displayed_count, 1);
 
-	$: offset2 = modulo($their_displayed_count, 1);
 	function modulo(n: number, m: number) {
 		// handle negative numbers
 		return ((n % m) + m) % m;
@@ -145,10 +143,18 @@
 		});
 		// console.log(board);
 	});
+	run(() => {
+		displayed_count.set(myKills);
+	});
+	run(() => {
+		their_displayed_count.set(theirKills);
+	});
+	let offset = $derived(modulo($displayed_count, 1));
+	let offset2 = $derived(modulo($their_displayed_count, 1));
 </script>
 
 <div class="sheet">
-	<button class="btn gradient-border" on:click={restartGame}> Restart </button>
+	<button class="btn gradient-border" onclick={restartGame}> Restart </button>
 
 	<div class="gradient-border score-card">
 		<div class="player-name">Black Player</div>

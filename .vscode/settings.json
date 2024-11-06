@@ -1,0 +1,51 @@
+{
+  "spellright.language": [
+    "en-US-9-0."
+  ],
+  "spellright.documentTypes": [
+    "markdown",
+    "latex",
+    "plaintext",
+    "typescript",
+    "svelte"
+  ],
+  "[svelte]": {
+    "editor.defaultFormatter": "svelte.svelte-vscode"
+  },
+  "css.validate": false,
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "html"
+  ],
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "editor.tabSize": 2,
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "cSpell.words": [
+    "backblaze",
+    "filereader",
+    "headshot",
+    "monark",
+    "precompress",
+    "skateshop",
+    "pocketbase",
+    "sveltekit",
+    "partytown",
+    "Opustuum",
+    "resumé",
+    "resumés",
+    "openai",
+    "croppie"
+  ],
+  "cSpell.enableFiletypes": [
+    "svelte"
+  ],
+  "editor.fontWeight": "normal"
+}

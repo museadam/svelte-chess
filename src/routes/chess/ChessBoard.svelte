@@ -12,8 +12,13 @@
 	// 	getValidMovesForBishop,
 	// 	getValidMovesKnight,
 	// 	kingMove
-	// } from '$lib/utils/moves';
-	export let board: SquareOnBoard[];
+	
+	interface Props {
+		// } from '$lib/utils/moves';
+		board: SquareOnBoard[];
+	}
+
+	let { board = $bindable() }: Props = $props();
 	// export let myKills;
 	let newRowIndex: string;
 	let newLocation;
@@ -367,7 +372,10 @@
 		// }
 		const movableBish = getValidMovesForBishop(currentPos, newPos);
 		const movableRook = getValidMovesForRook(currentPos, newPos);
-
+// pawn is the only one that needs to know
+// 		function removeColorPrefix(str) {
+//     return str.replace(/^(white-|black-)/, '');
+// }
 		switch (piece) {
 			case 'white-pawn':
 				moveValid = pawnWtMove(currentPos, newPos);
@@ -413,7 +421,7 @@
 	}
 	// export let board;
 
-	let currentPlayer = 'white';
+	let currentPlayer = $state('white');
 	let nextPlayer = 'black';
 	let kills = [];
 
@@ -535,8 +543,8 @@
 			<div
 				role="application"
 				class="square {square.color}"
-				on:drop={(event) => handleDrop(event, rowIndex, square)}
-				on:dragover={(event) => handleDragOver(event, square)}
+				ondrop={(event) => handleDrop(event, rowIndex, square)}
+				ondragover={(event) => handleDragOver(event, square)}
 			>
 				{#if square.piece}
 					<ChessPiece
@@ -547,7 +555,7 @@
 						on:dragger={() => handleChessComponent}
 						on:touchingend={(e) => handleChessTouchingEnd(e)}
 					>
-						<span class={square.piece} />
+						<span class={square.piece}></span>
 					</ChessPiece>
 				{/if}
 			</div>

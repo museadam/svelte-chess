@@ -1,17 +1,28 @@
 <script lang="ts">
-	export let rowIndex: number;
-	export let newRowIndex;
 	import type { SquareOnBoard } from '$types/board';
-	export let square: SquareOnBoard;
 
-	export let board: SquareOnBoard[];
 
 	// export let column;
 	import { createEventDispatcher } from 'svelte';
+	interface Props {
+		rowIndex: number;
+		newRowIndex: any;
+		square: SquareOnBoard;
+		board: SquareOnBoard[];
+		children?: import('svelte').Snippet;
+	}
+
+	let {
+		rowIndex,
+		newRowIndex = $bindable(),
+		square,
+		board,
+		children
+	}: Props = $props();
 	const dispatch = createEventDispatcher();
 	let item = true;
 	const noDrag = () => dispatch('dragger', { item });
-	let drag = false;
+	let drag = $state(false);
 	if (square.piece !== '') {
 		drag = true;
 	} else {
@@ -164,13 +175,13 @@
 <div
 	class="chess-piece"
 	draggable={drag}
-	on:dragstart={handleDragStart}
-	on:touchstart={handleTouchStart}
-	on:touchmove={handleTouchMove}
-	on:touchend={handleTouchEnd}
+	ondragstart={handleDragStart}
+	ontouchstart={handleTouchStart}
+	ontouchmove={handleTouchMove}
+	ontouchend={handleTouchEnd}
 >
 	<!-- {drag} -->
-	<slot />
+	{@render children?.()}
 </div>
 
 <!-- {:else}
