@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SquareOnBoard } from '$types/board';
+	import type { SquareOnBoard, Coord } from '$types/board';
 
 	// export let column;
 	import { createEventDispatcher } from 'svelte';
@@ -26,9 +26,7 @@
 		}
 	});
 
-	function handleDragStart(event) {
-		// console.log(event);
-
+	function handleDragStart(event: Event) {
 		// Set the data transfer object to identify the piece being dragged
 		if (square.piece !== '') {
 			item = true;
@@ -44,40 +42,20 @@
 			noDrag();
 		}
 	}
-	function distance(x1, y1, x2, y2) {
+	function distance(x1: number, y1: number, x2: number, y2: number) {
 		const pow1 = Math.pow(x2 - x1, 2);
 		const pow2 = Math.pow(y2 - y1, 2);
-		// console.log(pow1);
-		// console.log(pow2);
-
 		return Math.sqrt(pow1 + pow2);
-		// return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 	}
 
-	// 	function getDistance(coord1, coord2) {
-	//   const xDiff = coord1.x - coord2.x;
-	//   const yDiff = coord1.y - coord2.y;
-	//   return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-	// }
-	function findClosestCoordinates(coords, arr) {
-		// Calculate distance between two coordinates using distance formula
-		// console.log(coords);
-		// console.log(arr);
-		// console.log(arr);
-		// console.log('arr');
-
-		// Calculate distance between given coordinates and each coordinate in array
+	function findClosestCoordinates(coords: Coord, arr: SquareOnBoard[]) {
 		const distances = arr.map((c) => {
 			return {
 				coordinates: c,
-				distance: distance(coords.x, coords.y, c.coordinates.x, c.coordinates.y)
+				distance: distance(coords.x, coords.y, c?.coordinates?.x, c?.coordinates?.y)
 			};
 		});
-
-		// Sort array by distance and return closest coordinates
-
 		distances.sort((a, b) => a.distance - b.distance);
-
 		return distances[0].coordinates;
 	}
 
@@ -199,6 +177,9 @@
 	.chess-piece:-moz-drag-over {
 		cursor: grabbing;
 	}
+	/* .dragging {
+		background-color: pink;
+	} */
 	/* .chess-piece {
 		position: absolute;
 		width: 60px;

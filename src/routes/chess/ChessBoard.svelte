@@ -23,26 +23,19 @@
 	let { board = $bindable() }: Props = $props();
 	// export let myKills;
 	let newRowIndex: string = $state('');
-	let newLocation = $state();
-	let oldLocation = $state();
+	let newLocation: number | undefined = $state(); // index
+	let oldLocation = $state('');
 	let touch = $state(false);
 	let moveValid = $state(false);
 	let attackValid = $state(false);
-
 	// import type { SquareOnBoard } from '$types/board.ts';
-
 	let attackMove = $state(false);
-
+	let upgradePiece: string | boolean = $state(false);
 	function pawnBlkMove(currentPos: number[], newPos: number[]) {
 		const [currentRow, currentCol] = currentPos;
 		const [newRow, newCol] = newPos;
-
 		const checkCol = currentCol - 1 === newCol || currentCol + 1 === newCol;
-		// const checkRow = currentRow - 1 === newRow || currentRow + 1 === newRow;
 		const checkUpDown = newRow - currentRow !== 1;
-		// console.log(checkUpDown);
-		// console.log('checkUpDown');
-
 		// is it attacking left to right?
 		if (newRow <= currentRow) {
 			console.log('hi3');
@@ -52,6 +45,9 @@
 		if (newCol !== currentCol) {
 			if (checkCol && !checkUpDown && attackMove) {
 				console.log('attack');
+				if (newRow === 7) {
+					upgradePiece = 'black-queen';
+				}
 
 				return true;
 			} else {
@@ -60,14 +56,12 @@
 				return false;
 			}
 		}
-
 		// check if pawn is moving more than one space forward
 		if (newRow - currentRow > 2) {
 			console.log('hi2');
 
 			return false;
 		}
-
 		// check if pawn is moving two spaces forward on its first move
 		if (currentRow === 1 && newRow === 3) {
 			const getSquare = getSquareFromRC([currentRow + 1, currentCol]);
@@ -86,8 +80,7 @@
 
 			return false;
 		}
-		console.log(newRow - currentRow);
-
+		// console.log(newRow - currentRow);
 		// check if there is a piece blocking the pawn's path
 		// if (board[newRow][newCol] !== null) {
 		// 	return false;
@@ -97,6 +90,8 @@
 		if (attackMove) {
 			return false;
 		}
+		if (newRow === 7) upgradePiece = 'black-queen';
+
 		return true;
 	}
 
@@ -114,6 +109,7 @@
 		if (newCol !== currentCol) {
 			if (checkCol && !checkUpDown && attackMove) {
 				console.log('attack');
+				if (newRow === 0) upgradePiece = 'white-queen';
 
 				return true;
 			} else {
@@ -152,38 +148,18 @@
 			return false;
 		}
 
-		// check if there is a piece blocking the pawn's path
-		// if (board[newRow][newCol] !== null) {
-		// 	return false;
-		// }
-
-		// !not valid move attack getting this far is not vaild!
-		//
 		if (attackMove) {
 			return false;
 		}
+		if (newRow === 0) upgradePiece = 'white-queen';
+
 		return true;
 	}
 
 	function validateMove(piece: string, currentPos: number[], newPos: number[]) {
-		// const moves = [];
-		// // Calculate valid moves for knight
-		// const piec = board.find((p) => p.square === square);
+		const pieceSelect =
+			piece.includes('pawn') === true ? piece : piece.replace(/^(white-|black-)/, '');
 
-		// if (!piec) {
-		// 	return moves;
-		// }
-		// const movableBish = getValidMovesForBishop(board, currentPos, newPos);
-		// const movableRook = getValidMovesForRook(board, currentPos, newPos);
-		// pawn is the only one that needs to know
-		const pieceSelect = piece;
-		let str = pieceSelect;
-		function removeColorPrefix(str: string) {
-			if (!str.includes('pawn')) str.replace(/^(white-|black-)/, '');
-			return str;
-		}
-		str = removeColorPrefix(str);
-		console.log(pieceSelect);
 		switch (pieceSelect) {
 			case 'white-pawn':
 				moveValid = pawnWtMove(currentPos, newPos);
@@ -191,40 +167,22 @@
 			case 'black-pawn':
 				moveValid = pawnBlkMove(currentPos, newPos);
 				break;
-			case 'white-rook':
+			case 'rook':
 				moveValid = getValidMovesForRook(board, currentPos, newPos);
 				break;
-			case 'black-rook':
-				moveValid = getValidMovesForRook(board, currentPos, newPos);
-				break;
-			case 'white-knight':
+			case 'knight':
 				moveValid = getValidMovesKnight(currentPos, newPos);
 				break;
-			case 'black-knight':
-				moveValid = getValidMovesKnight(currentPos, newPos);
-				break;
-			case 'white-bishop':
+			case 'bishop':
 				moveValid = getValidMovesForBishop(board, currentPos, newPos);
 				break;
-			case 'black-bishop':
-				moveValid = getValidMovesForBishop(board, currentPos, newPos);
-				break;
-			case 'white-queen':
+			case 'queen':
 				moveValid =
 					getValidMovesForRook(board, currentPos, newPos) === false
 						? getValidMovesForBishop(board, currentPos, newPos)
 						: true;
 				break;
-			case 'black-queen':
-				moveValid =
-					getValidMovesForRook(board, currentPos, newPos) === false
-						? getValidMovesForBishop(board, currentPos, newPos)
-						: true;
-				break;
-			case 'white-king':
-				moveValid = kingMove(currentPos, newPos);
-				break;
-			case 'black-king':
+			case 'king':
 				moveValid = kingMove(currentPos, newPos);
 				break;
 			default:
@@ -238,26 +196,28 @@
 	let currentPlayer = $state('white');
 	let nextPlayer = 'black';
 	let kills = [];
-
-	async function handleDrop(event, row: number, square: SquareOnBoard) {
+	interface EventDetails {
+		piece: SquareOnBoard;
+		rowIndex: number;
+		pieceSquare: string;
+		pieceColor: string;
+	}
+	async function handleDrop(
+		event: string | (DragEvent & { currentTarget: EventTarget & HTMLDivElement }),
+		row: number,
+		square: SquareOnBoard
+	) {
 		// Get the piece data from the data transfer object
-		let piece, rowIndex, pieceSquare, pieceColor;
+		let piece, rowIndex, pieceSquare: string, pieceColor;
 		if (!touch) {
-			event.preventDefault();
 			[piece, rowIndex, pieceSquare, pieceColor] = event.dataTransfer
 				.getData('text/plain')
 				.split(',');
 		} else {
 			[piece, rowIndex, pieceSquare, pieceColor] = event.split(',');
 		}
-		// is piece a piece?? where you came from
-		const selectedPiece = board.find((piece) => piece.square === pieceSquare);
-		// console.log(board);
-		// console.log('board');
 
-		// Check if the move is valid
-		// console.log(square.square);
-		// console.log('square.square');
+		const selectedPiece = board.find((piece) => piece.square === pieceSquare) ?? square;
 		const currentPos = getRowAndColumn(pieceSquare);
 		const newPos = getRowAndColumn(square.square);
 
@@ -294,10 +254,11 @@
 					dispatch('kills', { kill, killBy });
 				}
 
-				board[row].piece = piece;
+				board[row].piece = upgradePiece !== false ? upgradePiece : piece;
 				board[rowIndex].piece = '';
 				attackMove = false;
 				moveValid = false;
+				upgradePiece = false;
 				if (currentPlayer === 'white') {
 					currentPlayer = 'black';
 					nextPlayer = 'white';
@@ -314,24 +275,17 @@
 			console.log('Its not your turn');
 		}
 		moveValid = false;
+		touch = false;
 	}
-	let handleDragFlag = false;
-	function handleDragOver(event, square) {
-		// console.log(square);
-		// console.log('event');
-
+	function handleDragOver(event: DragEvent & { currentTarget: EventTarget & HTMLDivElement }) {
 		event.preventDefault();
-		event.dataTransfer.dropEffect = 'drop';
+		if (event?.dataTransfer) event.dataTransfer.dropEffect = 'none';
 	}
 
-	function handleChessComponent(event) {
-		// console.log(event);
-		handleDragFlag = event;
-	}
-	function handleChessTouchingEnd(event) {
+	function handleChessTouchingEnd(event: CustomEvent) {
 		// console.log(event);
 		oldLocation = event.detail.item.oldLocation;
-		newLocation = event.detail.item.newLocation;
+		newLocation = event.detail.item.newLocation as number;
 		// console.log(oldLocation);
 		const square = board[newLocation];
 		// console.log(newLocation);
@@ -361,8 +315,11 @@
 			<div
 				role="application"
 				class="square {square.color}"
-				ondrop={(event) => handleDrop(event, rowIndex, square)}
-				ondragover={(event) => handleDragOver(event, square)}
+				ondrop={(event) => {
+					event.preventDefault();
+					handleDrop(event, rowIndex, square);
+				}}
+				ondragover={(event) => handleDragOver(event)}
 			>
 				{#if square.piece}
 					<ChessPiece
@@ -370,7 +327,6 @@
 						{rowIndex}
 						{board}
 						{newRowIndex}
-						on:dragger={() => handleChessComponent}
 						on:touchingend={(e) => handleChessTouchingEnd(e)}
 					>
 						<span class={square.piece}></span>

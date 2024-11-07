@@ -1,4 +1,6 @@
+## DEMO
 
+test it out here: https://svelte-chess.vercel.app
 
 ## Getting started
 
