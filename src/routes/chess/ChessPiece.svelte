@@ -12,6 +12,8 @@
 	}
 
 	let { rowIndex, newRowIndex = $bindable(), square, board, children }: Props = $props();
+	// $inspect(board);
+
 	const dispatch = createEventDispatcher();
 	let item = $state(true);
 	const noDrag = () => dispatch('dragger', { item });
@@ -61,6 +63,8 @@
 		// Calculate distance between two coordinates using distance formula
 		// console.log(coords);
 		// console.log(arr);
+		// console.log(arr);
+		// console.log('arr');
 
 		// Calculate distance between given coordinates and each coordinate in array
 		const distances = arr.map((c) => {
@@ -73,7 +77,6 @@
 		// Sort array by distance and return closest coordinates
 
 		distances.sort((a, b) => a.distance - b.distance);
-		// console.log(distances);
 
 		return distances[0].coordinates;
 	}
@@ -109,6 +112,8 @@
 		e.target.style.left = pageX;
 		e.target.style.top = pageY;
 		const x = touchLocation.clientX - 20;
+		// console.log(x);
+
 		const y = touchLocation.clientY - 60;
 		const currentLocation = {
 			x,

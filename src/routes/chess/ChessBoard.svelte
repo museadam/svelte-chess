@@ -70,9 +70,15 @@
 
 		// check if pawn is moving two spaces forward on its first move
 		if (currentRow === 1 && newRow === 3) {
-			console.log('hi4');
-
-			return true;
+			const getSquare = getSquareFromRC([currentRow + 1, currentCol]);
+			const b = board;
+			const boardDetail = b.filter((el) => el.square === getSquare)[0];
+			console.log(boardDetail);
+			if (boardDetail.piece === '') {
+				return true;
+			} else {
+				return false;
+			}
 		}
 		// check if pawn is moving one space forward
 		if (newRow - currentRow !== 1) {
@@ -129,8 +135,13 @@
 		// check if pawn is moving two spaces forward on its first move
 		if (currentRow === 6 && newRow === 4) {
 			console.log('hi4');
-
-			return true;
+			const getSquare = getSquareFromRC([currentRow - 1, currentCol]);
+			const boardDetail = board.filter((el) => el.square === getSquare)[0];
+			if (boardDetail.piece === '') {
+				return true;
+			} else {
+				return false;
+			}
 		}
 
 		// check if pawn is moving one space forward

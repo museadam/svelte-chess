@@ -133,6 +133,8 @@ export function getValidMovesForBishop(
 	for (let i = 0; i < getBetween.length; i++) {
 		const getSquare = getSquareFromRC(getBetween[i]);
 		const boardDetail = board.filter((el) => el.square === getSquare)[0];
+		// console.log(boardDetail);
+
 		if (boardDetail.piece !== '') {
 			spaceFree = false;
 		}

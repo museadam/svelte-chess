@@ -5,10 +5,9 @@
 	import ChessBoard from './ChessBoard.svelte';
 	import type { SquareOnBoard } from '$types/board.ts';
 
-	let rows = ['8', '7', '6', '5', '4', '3', '2', '1'];
-	let columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-	let board: SquareOnBoard[] = $state([]);
-	let pieces: SquareOnBoard[] = [
+	const rows = ['8', '7', '6', '5', '4', '3', '2', '1'];
+	const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+	const pieces = [
 		{ type: 'rook', color: 'white', position: 'a1' },
 		{ type: 'knight', color: 'white', position: 'b1' },
 		{ type: 'bishop', color: 'white', position: 'c1' },
@@ -54,27 +53,31 @@
 	function getPieceType(color: string, type: string) {
 		return color + '-' + type;
 	}
-	let startBoard: SquareOnBoard[] = [];
+
 	function setBoard() {
+		let brd = [];
+
 		for (let row of rows) {
 			for (let column of columns) {
 				let squareColor = getSquareColor(row, column);
 				let piece = pieces.find((p) => p.position === column + row);
 				let pieceType = piece ? getPieceType(piece.color, piece.type) : '';
-
-				board.push({
+				brd.push({
 					square: column + row,
 					color: squareColor,
 					piece: pieceType
 				});
-				startBoard = [...board];
-				startBoard = startBoard;
 			}
 		}
+		return brd;
 	}
-	// $: startBoard = board;
-	setBoard();
 
+	let startBoard: SquareOnBoard[] = $state.raw(setBoard());
+
+	// $: startBoard = board;
+	let board: SquareOnBoard[] = $state(setBoard());
+
+	// board = startBoard
 	// console.log(board);
 
 	// let board = [];
@@ -113,14 +116,15 @@
 	function restartGame() {
 		// board = [];
 		// setBoard();
-		console.log(startBoard);
+		// setBoard();
+
 		board = startBoard;
+		// console.log(board);
 	}
 	onMount(() => {
 		// drop_zone = document.querySelectorAll('.chess-board');
 
 		const squares = document.querySelectorAll('.chess-row');
-
 		// Loop through each square and add its position to the board object
 		squares.forEach((square) => {
 			// Get the position of the square relative to the screen
@@ -138,8 +142,8 @@
 			const coordinates = { x, y };
 
 			board[row] = { ...board[row], coordinates };
+			startBoard[row] = { ...startBoard[row], coordinates };
 		});
-		// console.log(board);
 	});
 	$effect(() => {
 		displayed_count.set(myKills);
