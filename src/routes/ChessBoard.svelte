@@ -67,7 +67,7 @@
 			const getSquare = getSquareFromRC([currentRow + 1, currentCol]);
 			const b = board;
 			const boardDetail = b.filter((el) => el.square === getSquare)[0];
-			console.log(boardDetail);
+			// console.log(boardDetail);
 			if (boardDetail.piece === '') {
 				return true;
 			} else {

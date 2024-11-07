@@ -89,7 +89,7 @@
 		</div>
 	</div>
 	<!-- <div class="gradient-border m-2"> -->
-	<ChessBoard {board} on:kills={(e) => handleKill(e)} />
+	<ChessBoard bind:board on:kills={(e) => handleKill(e)} />
 	<!-- </div> -->
 	<div class="gradient-border score-card">
 		<div class="player-name">White Player</div>
