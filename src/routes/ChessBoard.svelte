@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
-	import ChessPiece from './ChessPiece.svelte';
+	import ChessPiece from '$routes/ChessPiece.svelte';
 	import type { SquareOnBoard } from '$types/board';
 	import {
 		// 	pawnBlkMove,
@@ -13,7 +13,7 @@
 		getRowAndColumn,
 		getPathBetweenPositions,
 		getSquareFromRC
-	} from './moves';
+	} from '$lib/utils/moves';
 
 	interface Props {
 		// } from '$lib/utils/moves';
@@ -303,8 +303,8 @@
 	<div class="player-name">Player 1</div>
 	<div class="score">{myKills.length}</div>
 </div> -->
-<h2>
-	Its player {currentPlayer}'s turn
+<h2 class="turn-text">
+	Its {currentPlayer}'s turn
 </h2>
 <!-- kills: {kills.length} -->
 <div class="chess-board">
@@ -347,7 +347,20 @@
 		-ms-user-select: none;
 		user-select: none;
 	} */
-
+	.turn-text {
+		-webkit-box-pack: center;
+		-ms-flex-pack: center;
+		-webkit-justify-content: center;
+		justify-content: center;
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: -webkit-flex;
+		display: flex;
+		font-weight: 800;
+		font-size: 1.125rem; /* 18px */
+		line-height: 1.75rem; /* 28px */
+		color: rgb(33, 33, 33);
+	}
 	.chess-board {
 		display: grid;
 		grid-template-columns: repeat(8, 40px);

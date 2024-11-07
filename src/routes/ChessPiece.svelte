@@ -3,6 +3,7 @@
 
 	// export let column;
 	import { createEventDispatcher } from 'svelte';
+	import type { TouchEventHandler } from 'svelte/elements';
 	interface Props {
 		rowIndex: number;
 		newRowIndex: any;
@@ -52,7 +53,7 @@
 		const distances = arr.map((c) => {
 			return {
 				coordinates: c,
-				distance: distance(coords.x, coords.y, c?.coordinates?.x, c?.coordinates?.y)
+				distance: distance(coords.x, coords.y, c?.coordinates?.x ?? 0, c?.coordinates?.y ?? 0)
 			};
 		});
 		distances.sort((a, b) => a.distance - b.distance);
@@ -77,18 +78,18 @@
 	}
 	let boardRowIndex: number;
 	// this is determining the new location
-	function handleTouchMove(e) {
+	function handleTouchMove(event: TouchEventHandler<HTMLDivElement>) {
 		// console.log(e);
 
-		let touchLocation = e.targetTouches[0];
+		let touchLocation = event.targetTouches[0];
 		// console.log(touchLocation);
 		let pageX = Math.floor(touchLocation.pageX - 20) + 'px';
 		let pageY = Math.floor(touchLocation.pageY - 60) + 'px';
 		status = 'Touch x ' + pageX + ' Touch y ' + pageY;
 		// console.log(status);
-		e.target.style.position = 'absolute';
-		e.target.style.left = pageX;
-		e.target.style.top = pageY;
+		event.target.style.position = 'absolute';
+		event.target.style.left = pageX;
+		event.target.style.top = pageY;
 		const x = touchLocation.clientX - 20;
 		// console.log(x);
 
@@ -142,16 +143,14 @@
 			// }
 		}
 	}
-	function detectTouchEnd(x1, y1, x2, y2, w, h) {
-		//Very simple detection here
-		if (x2 - x1 > w) return false;
-		if (y2 - y1 > h) return false;
-		return true;
-	}
+	// function detectTouchEnd(x1, y1, x2, y2, w, h) {
+	// 	//Very simple detection here
+	// 	if (x2 - x1 > w) return false;
+	// 	if (y2 - y1 > h) return false;
+	// 	return true;
+	// }
 </script>
 
-<!-- Chess piece element -->
-<!-- {#if square.piece !== ''} -->
 <div
 	role="banner"
 	class="chess-piece"
@@ -161,15 +160,9 @@
 	ontouchmove={handleTouchMove}
 	ontouchend={handleTouchEnd}
 >
-	<!-- {drag} -->
 	{@render children?.()}
 </div>
 
-<!-- {:else}
-	<div class="chess-piece" draggable="false" on:dragstart={handleDragStart}>
-		<slot />
-	</div>
-{/if} -->
 <style>
 	.chess-piece {
 		cursor: grab;
