@@ -34,7 +34,7 @@ export function getValidMovesForRook(board: SquareOnBoard[], position: number[],
 	const rank = position[1];
 	const validMoves = [];
 	const search = newPos;
-	console.log('is a rook');
+	// console.log('is a rook');
 	// check horizontal moves
 	for (let i = 0; i < 8; i++) {
 		if (i !== file) {
@@ -59,7 +59,7 @@ export function getValidMovesForRook(board: SquareOnBoard[], position: number[],
 	let found = validMoves.some((arr) => arr.every((val, i) => val === search[i]));
 
 	const getBetween = getPathBetweenPositions(position, newPos, validMoves);
-	console.log(getBetween);
+	// console.log(getBetween);
 	// is there a piece in the po
 	// get squares between moves
 	let spaceFree = true;
@@ -96,7 +96,7 @@ export function getValidMovesForBishop(
 ) {
 	const validMoves = [];
 	const search = newPos;
-	console.log('is a bishop');
+	// console.log('is a bishop');
 
 	// console.log(search);
 
@@ -123,10 +123,10 @@ export function getValidMovesForBishop(
 		}
 	}
 	found = validMoves.some((arr) => arr.every((val, i) => val === search[i]));
-	console.log(validMoves);
-	console.log('validMoves');
+	// console.log(validMoves);
+	// console.log('validMoves');
 	const getBetween = getPathBetweenPositions(position, newPos, validMoves);
-	console.log(getBetween);
+	// console.log(getBetween);
 	// is there a piece in the po
 	// get squares between moves
 	let spaceFree = true;
@@ -161,7 +161,7 @@ export function getValidMovesKnight(position: number[], newPos: number[]) {
 		[x - 1, y + 2],
 		[x - 1, y - 2]
 	];
-	console.log('is a knight');
+	// console.log('is a knight');
 
 	for (let i = 0; i < potentialMoves.length; i++) {
 		const [nextX, nextY] = potentialMoves[i];
@@ -173,9 +173,9 @@ export function getValidMovesKnight(position: number[], newPos: number[]) {
 
 	const search = newPos;
 	const matrix = moves;
-	console.log(search);
-	console.log(matrix);
-	console.log('matrix');
+	// console.log(search);
+	// console.log(matrix);
+	// console.log('matrix');
 
 	const found = matrix.some((arr) => arr.every((val, i) => val === search[i]));
 

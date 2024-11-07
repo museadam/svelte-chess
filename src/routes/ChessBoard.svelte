@@ -234,9 +234,9 @@
 
 		// validateMove(piece, currentPos, newPos);
 		const isValidMove = validateMove(piece, currentPos, newPos); // moveValid; // true; // checkMove(board, [piecePosition], [row, square.position]);
-		const isAttackValid = attackValid;
-		console.log(isValidMove);
-		console.log('isValidMove');
+		// const isAttackValid = attackValid;
+		// console.log(isValidMove);
+		// console.log('isValidMove');
 
 		// console.log(color);
 		// console.log(p);
