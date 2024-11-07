@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { SquareOnBoard } from '$types/board';
 
-
 	// export let column;
 	import { createEventDispatcher } from 'svelte';
 	interface Props {
@@ -12,22 +11,19 @@
 		children?: import('svelte').Snippet;
 	}
 
-	let {
-		rowIndex,
-		newRowIndex = $bindable(),
-		square,
-		board,
-		children
-	}: Props = $props();
+	let { rowIndex, newRowIndex = $bindable(), square, board, children }: Props = $props();
 	const dispatch = createEventDispatcher();
-	let item = true;
+	let item = $state(true);
 	const noDrag = () => dispatch('dragger', { item });
 	let drag = $state(false);
-	if (square.piece !== '') {
-		drag = true;
-	} else {
-		drag = false;
-	}
+	$effect(() => {
+		if (square.piece !== '') {
+			drag = true;
+		} else {
+			drag = false;
+		}
+	});
+
 	function handleDragStart(event) {
 		// console.log(event);
 
@@ -82,13 +78,13 @@
 		return distances[0].coordinates;
 	}
 
-	let dropped = [];
-	let status = '';
+	let dropped = $state([]);
+	let status = $state('');
 
-	let dropped_in = '';
-	let activeEvent = '';
-	let originalX = '';
-	let originalY = '';
+	let dropped_in = $state('');
+	let activeEvent = $state('');
+	let originalX = $state('');
+	let originalY = $state('');
 	// get pixel locations of each square
 
 	// this offsets the piece to more easily see when touched
@@ -129,6 +125,7 @@
 	function handleTouchEnd(e) {
 		e.preventDefault();
 		// console.log(e);
+		// console.log(activeEvent);
 		if (activeEvent === 'move') {
 			const oldLocation = `${square.piece},${rowIndex},${square.square},${square.color}`;
 			const newLocation = boardRowIndex;
@@ -173,6 +170,7 @@
 <!-- Chess piece element -->
 <!-- {#if square.piece !== ''} -->
 <div
+	role="banner"
 	class="chess-piece"
 	draggable={drag}
 	ondragstart={handleDragStart}

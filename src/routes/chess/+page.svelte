@@ -79,10 +79,10 @@
 
 	// let board = [];
 	let myKills = $state(0);
-	let myKillsArr = [];
+	let myKillsArr = $state([]);
 
 	let theirKills = $state(0);
-	let theirKillsArr = [];
+	let theirKillsArr = $state([]);
 
 	function handleKill(event) {
 		event.preventDefault();
@@ -105,8 +105,6 @@
 
 	const displayed_count = spring();
 	const their_displayed_count = spring();
-
-
 
 	function modulo(n: number, m: number) {
 		// handle negative numbers
@@ -143,10 +141,10 @@
 		});
 		// console.log(board);
 	});
-	run(() => {
+	$effect(() => {
 		displayed_count.set(myKills);
 	});
-	run(() => {
+	$effect(() => {
 		their_displayed_count.set(theirKills);
 	});
 	let offset = $derived(modulo($displayed_count, 1));
@@ -165,7 +163,7 @@
 			</div>
 		</div>
 	</div>
-	<ChessBoard {board} {myKills} on:kills={(e) => handleKill(e)} />
+	<ChessBoard {board} on:kills={(e) => handleKill(e)} />
 	<div class="gradient-border score-card">
 		<div class="player-name">White Player</div>
 		<div class="counter-viewport">
