@@ -77,17 +77,12 @@
 		// check if pawn is moving one space forward
 		if (newRow - currentRow !== 1) {
 			console.log('hi5' + (newRow - currentRow));
-
 			return false;
 		}
-		// console.log(newRow - currentRow);
-		// check if there is a piece blocking the pawn's path
-		// if (board[newRow][newCol] !== null) {
-		// 	return false;
-		// }
-		// !not valid move attack getting this far is not vaild!
-		//
+
+		// may never hit
 		if (attackMove) {
+			console.log('pawn attack not valid');
 			return false;
 		}
 		if (newRow === 7) upgradePiece = 'black-queen';
@@ -149,6 +144,8 @@
 		}
 
 		if (attackMove) {
+			console.log('pawn attack not valid');
+
 			return false;
 		}
 		if (newRow === 0) upgradePiece = 'white-queen';
@@ -208,8 +205,13 @@
 		square: SquareOnBoard
 	) {
 		// Get the piece data from the data transfer object
+		console.log(event?.dataTransfer);
+		console.log('event.dataTransfer');
+
 		let piece, rowIndex, pieceSquare: string, pieceColor;
 		if (!touch) {
+			event.preventDefault();
+
 			[piece, rowIndex, pieceSquare, pieceColor] = event.dataTransfer
 				.getData('text/plain')
 				.split(',');
@@ -279,7 +281,7 @@
 	}
 	function handleDragOver(event: DragEvent & { currentTarget: EventTarget & HTMLDivElement }) {
 		event.preventDefault();
-		if (event?.dataTransfer) event.dataTransfer.dropEffect = 'none';
+		if (event?.dataTransfer) event.dataTransfer.dropEffect = 'drop';
 	}
 
 	function handleChessTouchingEnd(event: CustomEvent) {
@@ -315,10 +317,7 @@
 			<div
 				role="application"
 				class="square {square.color}"
-				ondrop={(event) => {
-					event.preventDefault();
-					handleDrop(event, rowIndex, square);
-				}}
+				ondrop={(event) => handleDrop(event, rowIndex, square)}
 				ondragover={(event) => handleDragOver(event)}
 			>
 				{#if square.piece}
@@ -347,6 +346,10 @@
 		-ms-user-select: none;
 		user-select: none;
 	} */
+	.m-2 {
+		margin: 0.5rem; /* 4px */
+		margin-top: 0.8rem;
+	}
 	.turn-text {
 		-webkit-box-pack: center;
 		-ms-flex-pack: center;
@@ -430,6 +433,7 @@
 
 	.white-pawn:before {
 		content: '\2659';
+		/* font-weight: 600; */
 	}
 
 	.black-king:before {

@@ -18,7 +18,7 @@
 
 	function handleKill(event: CustomEvent) {
 		event.preventDefault();
-		console.log(event);
+		// console.log(event);
 		let tempKills;
 		tempKills = event.detail.killBy;
 		if (tempKills === 'white') {
@@ -88,9 +88,8 @@
 			</div>
 		</div>
 	</div>
-	<!-- <div class="gradient-border m-2"> -->
 	<ChessBoard bind:board on:kills={(e) => handleKill(e)} />
-	<!-- </div> -->
+
 	<div class="gradient-border score-card">
 		<div class="player-name">White Player</div>
 		<div class="counter-viewport">
@@ -113,10 +112,6 @@
 </div> -->
 
 <style>
-	.m-2 {
-		margin: 0.5rem; /* 4px */
-		margin-top: 0.8rem;
-	}
 	.btn {
 		all: unset;
 		display: flex;
@@ -210,7 +205,6 @@
 		animation: animated-gradient 9s ease alternate infinite;
 		background-size: 300% 300%;
 	}
-
 	@keyframes animated-gradient {
 		0% {
 			background-position: 0% 50%;

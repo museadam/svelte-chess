@@ -17,7 +17,7 @@
 
 	const dispatch = createEventDispatcher();
 	let item = $state(true);
-	const noDrag = () => dispatch('dragger', { item });
+	// const noDrag = () => dispatch('dragger', { item });
 	let drag = $state(false);
 	$effect(() => {
 		if (square.piece !== '') {
@@ -31,7 +31,7 @@
 		// Set the data transfer object to identify the piece being dragged
 		if (square.piece !== '') {
 			item = true;
-			noDrag();
+			// noDrag();
 			// console.log(square.piece);
 			event.dataTransfer.setData(
 				'text/plain',
@@ -40,7 +40,7 @@
 			event.dataTransfer.effectAllowed = 'move';
 		} else {
 			item = false;
-			noDrag();
+			// noDrag();
 		}
 	}
 	function distance(x1: number, y1: number, x2: number, y2: number) {
@@ -60,10 +60,10 @@
 		return distances[0].coordinates;
 	}
 
-	let dropped = $state([]);
+	// let dropped = $state([]);
 	let status = $state('');
 
-	let dropped_in = $state('');
+	// let dropped_in = $state('');
 	let activeEvent = $state('');
 	let originalX = $state('');
 	let originalY = $state('');
@@ -78,18 +78,19 @@
 	}
 	let boardRowIndex: number;
 	// this is determining the new location
-	function handleTouchMove(event: TouchEventHandler<HTMLDivElement>) {
+	function handleTouchMove(e) {
 		// console.log(e);
+		console.log('hand touch move');
 
-		let touchLocation = event.targetTouches[0];
+		let touchLocation = e.targetTouches[0];
 		// console.log(touchLocation);
 		let pageX = Math.floor(touchLocation.pageX - 20) + 'px';
 		let pageY = Math.floor(touchLocation.pageY - 60) + 'px';
 		status = 'Touch x ' + pageX + ' Touch y ' + pageY;
 		// console.log(status);
-		event.target.style.position = 'absolute';
-		event.target.style.left = pageX;
-		event.target.style.top = pageY;
+		e.target.style.position = 'absolute';
+		e.target.style.left = pageX;
+		e.target.style.top = pageY;
 		const x = touchLocation.clientX - 20;
 		// console.log(x);
 
@@ -109,7 +110,8 @@
 	function handleTouchEnd(e) {
 		e.preventDefault();
 		// console.log(e);
-		// console.log(activeEvent);
+		console.log('hand touch end');
+
 		if (activeEvent === 'move') {
 			const oldLocation = `${square.piece},${rowIndex},${square.square},${square.color}`;
 			const newLocation = boardRowIndex;
@@ -167,9 +169,12 @@
 	.chess-piece {
 		cursor: grab;
 	}
-	.chess-piece:-moz-drag-over {
+	.chess-piece:active {
 		cursor: grabbing;
 	}
+	/* .chess-piece:-moz-drag-over {
+		cursor: grabbing;
+	} */
 	/* .dragging {
 		background-color: pink;
 	} */
