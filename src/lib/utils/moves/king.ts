@@ -1,10 +1,7 @@
 import type { SquareOnBoard, ValidMove } from '$types/board';
 import { getSquareFromRC } from '.';
 
-export function getKingMoves(
-	board: SquareOnBoard[],
-	currentPos: number[]
-): ValidMove[] | undefined {
+export function getKingMoves(board: SquareOnBoard[], currentPos: number[]): ValidMove[] | [] {
 	const [currentRow, currentCol] = currentPos;
 	const validMoves: ValidMove[] = [];
 	const getPlayer = getSquareFromRC(currentPos);
@@ -34,45 +31,48 @@ export function getKingMoves(
 			const getSquare = getSquareFromRC([newRow, newCol]);
 			const boardDetail = board.filter((el) => el.square === getSquare)[0];
 			if (boardDetail.piece !== '' && !boardDetail.piece.includes(player)) {
-				validMoves.push([newRow, newCol, 'attack']);
+				validMoves.push([newRow, newCol, 'attack', 0]);
 			} else if (boardDetail.piece === '') {
-				validMoves.push([newRow, newCol, 'move']);
+				validMoves.push([newRow, newCol, 'move', 0]);
 			}
 		}
 	}
-	let ret;
+	let ret: ValidMove[] | [] = [];
 	if (validMoves.length > 0) ret = validMoves;
 	return ret;
 }
 
-export function kingMove(board: SquareOnBoard[], currentPos: number[], newPos: number[]) {
+export function kingMove(board: SquareOnBoard[], currentPos: number[], newPos?: number[]) {
 	const [currentRow, currentCol] = currentPos;
-	const [newRow, newCol] = newPos;
-	// const validMoves = []
-
-	// if ()
 	let ret;
 	ret = getKingMoves(board, currentPos);
 
-	if (newRow - currentRow > 1) {
-		console.log('row check');
+	let newRow: number | undefined, newCol: number | undefined;
+	if (newPos) [newRow, newCol] = newPos;
+	// const validMoves = []
 
-		return false;
-	}
-	if (newCol - currentCol > 1) {
-		console.log('col check');
+	// if ()
+	if (newRow && newCol) {
+		if (newRow - currentRow > 1) {
+			console.log('row check');
 
-		return false;
-	}
-	if (currentRow - newRow > 1) {
-		console.log('row check');
+			return false;
+		}
+		if (newCol - currentCol > 1) {
+			console.log('col check');
 
-		return false;
-	}
-	if (currentCol - newCol > 1) {
-		console.log('col check');
+			return false;
+		}
+		if (currentRow - newRow > 1) {
+			console.log('row check');
 
-		return false;
+			return false;
+		}
+		if (currentCol - newCol > 1) {
+			console.log('col check');
+
+			return false;
+		}
 	}
 	return ret ?? true;
 }

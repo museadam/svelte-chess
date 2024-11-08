@@ -2,9 +2,9 @@
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 	import ChessPiece from '$routes/ChessPiece.svelte';
-	import type { SquareOnBoard } from '$types/board';
+	import type { SquareOnBoard, ValidMove } from '$types/board';
 	import { getRowAndColumn } from '$lib/utils/moves';
-	import { validateMove } from '$lib/utils/moves/validate';
+	import { calcMoves, validateMove } from '$lib/utils/moves/validate';
 
 	interface Props {
 		board: SquareOnBoard[];
@@ -73,12 +73,15 @@
 					dispatch('kills', { kill, killBy });
 				}
 				const strValidMov = isValidMove.toString();
-				let upgradePiece: string | boolean = false;
-
+				let upgradePiece: boolean | ValidMove[] = false;
 				upgradePiece = strValidMov?.includes('queen') === true ? isValidMove : false;
 				board[row].piece = upgradePiece !== false ? upgradePiece : piece;
 				board[rowIndex].piece = '';
+				board[rowIndex].potentialMoves = [];
+
 				touch = false;
+				// recalculate all moves for bot
+				calcMoves(board);
 
 				if (currentPlayer === 'white') {
 					currentPlayer = 'black';

@@ -1,14 +1,17 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import ChessBoard from '$routes/ChessBoard.svelte';
 	import type { SquareOnBoard } from '$types/board.ts';
 	import { spring } from 'svelte/motion';
 	import { setBoard } from '$src/lib/utils/board';
+	import { calcMoves } from '$lib/utils/moves/validate';
+	import { getRowAndColumn } from '$src/lib/utils/moves';
 
 	let startBoard: SquareOnBoard[] = $state.raw(setBoard());
 	let board: SquareOnBoard[] = $state(setBoard());
 
 	// $inspect(board[0]);
+	$inspect(board);
 
 	let myKills = $state(0);
 	let myKillsArr = $state([]);
@@ -22,9 +25,10 @@
 		myKillsArr = [];
 		theirKillsArr = [];
 		board = startBoard;
+		calcMoves(board);
 	}
 
-	function handleKill(event: CustomEvent) {
+	async function handleKill(event: CustomEvent) {
 		// event.preventDefault();
 		// console.log(event);
 		let tempKills;
@@ -37,7 +41,8 @@
 			theirKills += 1;
 		}
 		if (event.detail.kill === 'white-king' || event.detail.kill === 'black-king') {
-			alert('YOU WIN!');
+			// alert('YOU WIN!');
+			await tick();
 			restartGame();
 		}
 	}
@@ -78,6 +83,7 @@
 			if (row) board[+row] = { ...board[+row], coordinates };
 			if (row) startBoard[+row] = { ...startBoard[+row], coordinates };
 		});
+		calcMoves(board);
 	});
 </script>
 

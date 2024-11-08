@@ -1,7 +1,7 @@
 import type { SquareOnBoard } from '$types/board';
 import { getSquareFromRC } from '.';
 
-export function getValidMovesKnight(board: SquareOnBoard[], position: number[], newPos: number[]) {
+export function getValidMovesKnight(board: SquareOnBoard[], position: number[], newPos?: number[]) {
 	const moves = [];
 	const getPlayer = getSquareFromRC(position);
 	const getPlayPositionDetails = board.filter((el) => el.square === getPlayer)[0];
@@ -36,9 +36,11 @@ export function getValidMovesKnight(board: SquareOnBoard[], position: number[], 
 		}
 	}
 	// console.log(moves);
-	const found = moves.some((arr) => arr[0] === newPos[0] && arr[1] === newPos[1]);
+	let found;
 
-	if (found) {
+	if (newPos) found = moves.some((arr) => arr[0] === newPos[0] && arr[1] === newPos[1]);
+
+	if (!newPos || found) {
 		return moves;
 	} else {
 		return false;

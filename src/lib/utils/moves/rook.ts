@@ -1,7 +1,11 @@
 import type { SquareOnBoard } from '$types/board';
 import { calculateValidMove } from '.';
 
-export function getValidMovesForRook(board: SquareOnBoard[], position: number[], newPos: number[]) {
+export function getValidMovesForRook(
+	board: SquareOnBoard[],
+	position: number[],
+	newPos?: number[]
+) {
 	const file = position[0];
 	const rank = position[1];
 	const validMoves = [];
@@ -25,10 +29,11 @@ export function getValidMovesForRook(board: SquareOnBoard[], position: number[],
 			if (move) validMoves.push(move);
 		}
 	}
+	let found;
 
-	const found = validMoves.some((arr) => arr[0] === newPos[0] && arr[1] === newPos[1]);
+	if (newPos) found = validMoves.some((arr) => arr[0] === newPos[0] && arr[1] === newPos[1]);
 
-	if (found && validMoves) {
+	if (found || !newPos) {
 		return validMoves;
 	} else {
 		return false;

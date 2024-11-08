@@ -4,7 +4,7 @@ import { calculateValidMove } from '.';
 export function getValidMovesForBishop(
 	board: SquareOnBoard[],
 	position: number[],
-	newPos: number[]
+	newPos?: number[]
 ) {
 	const validMoves = [];
 
@@ -33,11 +33,12 @@ export function getValidMovesForBishop(
 			if (move) validMoves.push(move);
 		}
 	}
-	const found = validMoves.some((arr) => arr[0] === newPos[0] && arr[1] === newPos[1]);
+	let found;
+	if (newPos) found = validMoves.some((arr) => arr[0] === newPos[0] && arr[1] === newPos[1]);
 
 	// const foundOther = matrix.some((arr) => arr.every((val, i) => val === search[i]));
 	// console.log(validMoves);
-	if (validMoves && found) {
+	if (!newPos || found) {
 		return validMoves;
 	} else {
 		return false;

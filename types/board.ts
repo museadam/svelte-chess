@@ -3,6 +3,8 @@ export type SquareOnBoard = {
 	color: Colors;
 	piece: string;
 	coordinates?: Coord;
+	potentialMoves?: ValidMove[];
+	weight?: number;
 };
 
 export type Coord = {
@@ -12,4 +14,5 @@ export type Coord = {
 
 export type Colors = 'dark' | 'light';
 
-export type ValidMove = [number, number, 'move' | 'attack'] | undefined;
+// [x, y, moveType, weight(strength of move)]
+export type ValidMove = [number, number, 'move' | 'attack', number] | undefined;

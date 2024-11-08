@@ -107,9 +107,9 @@ export function calculateValidMove(
 		}
 	}
 	if (boardDetail.piece !== '' && spacesBetweenFree && !boardDetail.piece.includes(player)) {
-		return [row, col, 'attack'];
+		return [row, col, 'attack', 0];
 	} else if (boardDetail.piece === '' && spacesBetweenFree && !boardDetail.piece.includes(player)) {
-		return [row, col, 'move'];
+		return [row, col, 'move', 0];
 	} else {
 		return;
 	}
