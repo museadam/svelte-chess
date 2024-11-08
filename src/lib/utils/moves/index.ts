@@ -1,9 +1,32 @@
-import type { SquareOnBoard } from '$types/board';
+import type { SquareOnBoard, ValidMove } from '$types/board';
+
+export * from './pawn';
+export * from './rook';
+export * from './knight';
+export * from './bishop';
+export * from './king';
 
 export function getPathBetweenPositions(start: number[], end: number[], moves: number[][]) {
-	const path = [];
+	const path: number[][] = [];
 	const [startRow, startCol] = start;
 	const [endRow, endCol] = end;
+
+	// Check if start and end are in a valid straight line (diagonal, horizontal, or vertical)
+	const isDiagonal = Math.abs(endRow - startRow) === Math.abs(endCol - startCol);
+	const isHorizontal = startRow === endRow;
+	const isVertical = startCol === endCol;
+	// console.log(isDiagonal);
+	// console.log(isHorizontal);
+	// console.log(isVertical);
+
+	if (!(isDiagonal || isHorizontal || isVertical)) {
+		throw new Error('Start and end positions are not on a valid path.');
+	}
+
+	// If start and end are the same, return an empty path
+	if (startRow === endRow && startCol === endCol) {
+		return path;
+	}
 
 	// Determine direction of movement
 	const rowDirection = Math.sign(endRow - startRow);
@@ -13,204 +36,20 @@ export function getPathBetweenPositions(start: number[], end: number[], moves: n
 	let currentRow = startRow + rowDirection;
 	let currentCol = startCol + colDirection;
 
-	// Add each intermediate position until reaching `end`
 	while (currentRow !== endRow || currentCol !== endCol) {
 		if (moves.some(([r, c]) => r === currentRow && c === currentCol)) {
 			path.push([currentRow, currentCol]);
 		}
 		currentRow += rowDirection;
 		currentCol += colDirection;
+
+		// Safety check to avoid infinite loops
 		if (currentRow < 0 || currentRow > 7 || currentCol < 0 || currentCol > 7) {
 			throw new Error('Out of bounds encountered during path traversal.');
 		}
 	}
 
 	return path;
-}
-
-export function getValidMovesForRook(board: SquareOnBoard[], position: number[], newPos: number[]) {
-	// const rowI = row;
-	const file = position[0];
-	const rank = position[1];
-	const validMoves = [];
-	const search = newPos;
-	// console.log('is a rook');
-	// check horizontal moves
-	for (let i = 0; i < 8; i++) {
-		if (i !== file) {
-			const row = i;
-			validMoves.push([row, rank]);
-		}
-	}
-
-	// check vertical moves
-	for (let i = 0; i <= 8; i++) {
-		if (i !== rank) {
-			const row = file;
-			const col = i;
-			validMoves.push([row, col]);
-		}
-	}
-
-	// console.log(matrix);
-
-	// console.log(search);
-
-	let found = validMoves.some((arr) => arr.every((val, i) => val === search[i]));
-
-	const getBetween = getPathBetweenPositions(position, newPos, validMoves);
-	// console.log(getBetween);
-	// is there a piece in the po
-	// get squares between moves
-	let spaceFree = true;
-	for (let i = 0; i < getBetween.length; i++) {
-		const getSquare = getSquareFromRC(getBetween[i]);
-		const boardDetail = board.filter((el) => el.square === getSquare)[0];
-		if (boardDetail.piece !== '') {
-			spaceFree = false;
-		}
-	}
-	// let found;
-	// for (let i = 0; i < validMoves.length; i++) {
-	// 	console.log(search);
-	// 	console.log(validMoves[i]);
-
-	// 	if (validMoves[i] === newPos) {
-	// 		found = true;
-	// 	} else {
-	// 		found = false;
-	// 	}
-	// }
-	// console.log(found);
-
-	if (found && spaceFree) {
-		return true;
-	} else {
-		return false;
-	}
-}
-export function getValidMovesForBishop(
-	board: SquareOnBoard[],
-	position: number[],
-	newPos: number[]
-) {
-	const validMoves = [];
-	const search = newPos;
-	// console.log('is a bishop');
-
-	// console.log(search);
-
-	let found = false;
-	// The bishop can move diagonally in any direction, so we need to check all diagonal lines
-	for (let i = -7; i <= 7; i++) {
-		// Ignore moves that don't actually move the bishop
-		if (i === 0) {
-			continue;
-		}
-
-		// Check the diagonal line that goes from top-left to bottom-right
-		let row = position[0] + i;
-		let col = position[1] + i;
-		if (row >= 0 && row <= 7 && col >= 0 && col <= 7) {
-			validMoves.push([row, col]);
-		}
-
-		// Check the diagonal line that goes from top-right to bottom-left
-		row = position[0] + i;
-		col = position[1] - i;
-		if (row >= 0 && row <= 7 && col >= 0 && col <= 7) {
-			validMoves.push([row, col]);
-		}
-	}
-	found = validMoves.some((arr) => arr.every((val, i) => val === search[i]));
-	// console.log(validMoves);
-	// console.log('validMoves');
-	const getBetween = getPathBetweenPositions(position, newPos, validMoves);
-	// console.log(getBetween);
-	// is there a piece in the po
-	// get squares between moves
-	let spaceFree = true;
-	for (let i = 0; i < getBetween.length; i++) {
-		const getSquare = getSquareFromRC(getBetween[i]);
-		const boardDetail = board.filter((el) => el.square === getSquare)[0];
-		// console.log(boardDetail);
-
-		if (boardDetail.piece !== '') {
-			spaceFree = false;
-		}
-	}
-	// const foundOther = matrix.some((arr) => arr.every((val, i) => val === search[i]));
-
-	if (found && spaceFree) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
-export function getValidMovesKnight(position: number[], newPos: number[]) {
-	const moves = [];
-	const [x, y] = position;
-	const potentialMoves = [
-		[x + 2, y + 1],
-		[x + 2, y - 1],
-		[x - 2, y + 1],
-		[x - 2, y - 1],
-		[x + 1, y + 2],
-		[x + 1, y - 2],
-		[x - 1, y + 2],
-		[x - 1, y - 2]
-	];
-	// console.log('is a knight');
-
-	for (let i = 0; i < potentialMoves.length; i++) {
-		const [nextX, nextY] = potentialMoves[i];
-		// if (nextX < 0 || nextX > 7 || nextY < 0 || nextY > 7) {
-		// 	continue; // Skip invalid moves that go off the board
-		// }
-		moves.push([nextX, nextY]);
-	}
-
-	const search = newPos;
-	const matrix = moves;
-	// console.log(search);
-	// console.log(matrix);
-	// console.log('matrix');
-
-	const found = matrix.some((arr) => arr.every((val, i) => val === search[i]));
-
-	if (found) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
-export function kingMove(currentPos: number[], newPos: number[]) {
-	const [currentRow, currentCol] = currentPos;
-	const [newRow, newCol] = newPos;
-
-	if (newRow - currentRow > 1) {
-		console.log('row check');
-
-		return false;
-	}
-	if (newCol - currentCol > 1) {
-		console.log('col check');
-
-		return false;
-	}
-	if (currentRow - newRow > 1) {
-		console.log('row check');
-
-		return false;
-	}
-	if (currentCol - newCol > 1) {
-		console.log('col check');
-
-		return false;
-	}
-	return true;
 }
 
 export function getRowAndColumn(square: string): number[] {
@@ -225,4 +64,53 @@ export function getSquareFromRC(square: number[]): string {
 	const file = String.fromCharCode(column + 97); // Convert column to file letter (a-h)
 	const rank = 8 - row; // Convert row to rank number (1-8)
 	return `${file}${rank}`;
+}
+
+function setAllMoves() {
+	const allMoves = [];
+
+	for (let row = 0; row <= 7; row++) {
+		for (let col = 0; col <= 7; col++) {
+			allMoves.push([row, col]);
+		}
+	}
+	return allMoves;
+}
+
+export function calculateValidMove(
+	board: SquareOnBoard[],
+	oldPosition: number[],
+	newPosition: number[]
+): ValidMove {
+	const getPlayer = getSquareFromRC(oldPosition);
+	const player =
+		board.filter((el) => el.square === getPlayer)[0].piece.includes('white') === true
+			? 'white'
+			: 'black';
+
+	const allMoves = setAllMoves();
+	const [row, col] = newPosition;
+	const getSquare = getSquareFromRC(newPosition);
+	const boardDetail = board.filter((el) => el.square === getSquare)[0];
+
+	const getBetween = getPathBetweenPositions(oldPosition, newPosition, allMoves);
+	// console.log(boardDetail);
+
+	let spacesBetweenFree = true;
+	for (let i = 0; i < getBetween.length; i++) {
+		const getSq = getSquareFromRC(getBetween[i]);
+		const boardDet = board.filter((el) => el.square === getSq)[0];
+		// console.log(boardDet);
+
+		if (boardDet.piece !== '') {
+			spacesBetweenFree = false;
+		}
+	}
+	if (boardDetail.piece !== '' && spacesBetweenFree && !boardDetail.piece.includes(player)) {
+		return [row, col, 'attack'];
+	} else if (boardDetail.piece === '' && spacesBetweenFree && !boardDetail.piece.includes(player)) {
+		return [row, col, 'move'];
+	} else {
+		return;
+	}
 }

@@ -3,210 +3,38 @@
 	const dispatch = createEventDispatcher();
 	import ChessPiece from '$routes/ChessPiece.svelte';
 	import type { SquareOnBoard } from '$types/board';
-	import {
-		// 	pawnBlkMove,
-		// 	pawnWtMove,
-		getValidMovesForRook,
-		getValidMovesForBishop,
-		getValidMovesKnight,
-		kingMove,
-		getRowAndColumn,
-		getPathBetweenPositions,
-		getSquareFromRC
-	} from '$lib/utils/moves';
+	import { getRowAndColumn } from '$lib/utils/moves';
+	import { validateMove } from '$lib/utils/moves/validate';
 
 	interface Props {
-		// } from '$lib/utils/moves';
 		board: SquareOnBoard[];
 	}
 
 	let { board = $bindable() }: Props = $props();
-	// export let myKills;
 	let newRowIndex: string = $state('');
+
 	let newLocation: number | undefined = $state(); // index
 	let oldLocation = $state('');
 	let touch = $state(false);
-	let moveValid = $state(false);
-	let attackValid = $state(false);
-	// import type { SquareOnBoard } from '$types/board.ts';
-	let attackMove = $state(false);
-	let upgradePiece: string | boolean = $state(false);
-	function pawnBlkMove(currentPos: number[], newPos: number[]) {
-		const [currentRow, currentCol] = currentPos;
-		const [newRow, newCol] = newPos;
-		const checkCol = currentCol - 1 === newCol || currentCol + 1 === newCol;
-		const checkUpDown = newRow - currentRow !== 1;
-		// is it attacking left to right?
-		if (newRow <= currentRow) {
-			console.log('hi3');
-			return false;
-		}
-		// check if pawn is moving forward
-		if (newCol !== currentCol) {
-			if (checkCol && !checkUpDown && attackMove) {
-				console.log('attack');
-				if (newRow === 7) {
-					upgradePiece = 'black-queen';
-				}
-
-				return true;
-			} else {
-				console.log('hi1 move false');
-
-				return false;
-			}
-		}
-		// check if pawn is moving more than one space forward
-		if (newRow - currentRow > 2) {
-			console.log('hi2');
-
-			return false;
-		}
-		// check if pawn is moving two spaces forward on its first move
-		if (currentRow === 1 && newRow === 3) {
-			const getSquare = getSquareFromRC([currentRow + 1, currentCol]);
-			const b = board;
-			const boardDetail = b.filter((el) => el.square === getSquare)[0];
-			// console.log(boardDetail);
-			if (boardDetail.piece === '') {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		// check if pawn is moving one space forward
-		if (newRow - currentRow !== 1) {
-			console.log('hi5' + (newRow - currentRow));
-			return false;
-		}
-
-		// may never hit
-		if (attackMove) {
-			console.log('pawn attack not valid');
-			return false;
-		}
-		if (newRow === 7) upgradePiece = 'black-queen';
-
-		return true;
-	}
-
-	function pawnWtMove(currentPos: number[], newPos: number[]) {
-		const [currentRow, currentCol] = currentPos;
-		const [newRow, newCol] = newPos;
-		const checkCol = currentCol - 1 === newCol || currentCol + 1 === newCol;
-		const checkUpDown = newRow - currentRow !== -1;
-		if (newRow >= currentRow) {
-			console.log('hi3');
-			return false;
-		}
-
-		// check if pawn is moving forward
-		if (newCol !== currentCol) {
-			if (checkCol && !checkUpDown && attackMove) {
-				console.log('attack');
-				if (newRow === 0) upgradePiece = 'white-queen';
-
-				return true;
-			} else {
-				console.log('hi1 move false');
-
-				return false;
-			}
-		}
-
-		// check if pawn is moving more than one space forwards
-		if (newRow - currentRow > 2) {
-			console.log('hi2');
-
-			return false;
-		}
-
-		// check if pawn is moving direction
-
-		// check if pawn is moving two spaces forward on its first move
-		if (currentRow === 6 && newRow === 4) {
-			console.log('hi4');
-			const getSquare = getSquareFromRC([currentRow - 1, currentCol]);
-			const boardDetail = board.filter((el) => el.square === getSquare)[0];
-			if (boardDetail.piece === '') {
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-		// check if pawn is moving one space forward
-		if (newRow - currentRow !== -1) {
-			// console.log(newRow - currentRow);
-			console.log('hi5' + (newRow - currentRow));
-
-			return false;
-		}
-
-		if (attackMove) {
-			console.log('pawn attack not valid');
-
-			return false;
-		}
-		if (newRow === 0) upgradePiece = 'white-queen';
-
-		return true;
-	}
-
-	function validateMove(piece: string, currentPos: number[], newPos: number[]) {
-		const pieceSelect =
-			piece.includes('pawn') === true ? piece : piece.replace(/^(white-|black-)/, '');
-
-		switch (pieceSelect) {
-			case 'white-pawn':
-				moveValid = pawnWtMove(currentPos, newPos);
-				break;
-			case 'black-pawn':
-				moveValid = pawnBlkMove(currentPos, newPos);
-				break;
-			case 'rook':
-				moveValid = getValidMovesForRook(board, currentPos, newPos);
-				break;
-			case 'knight':
-				moveValid = getValidMovesKnight(currentPos, newPos);
-				break;
-			case 'bishop':
-				moveValid = getValidMovesForBishop(board, currentPos, newPos);
-				break;
-			case 'queen':
-				moveValid =
-					getValidMovesForRook(board, currentPos, newPos) === false
-						? getValidMovesForBishop(board, currentPos, newPos)
-						: true;
-				break;
-			case 'king':
-				moveValid = kingMove(currentPos, newPos);
-				break;
-			default:
-				break;
-		}
-
-		return moveValid;
-	}
-	// export let board;
 
 	let currentPlayer = $state('white');
-	let nextPlayer = 'black';
-	let kills = [];
-	interface EventDetails {
-		piece: SquareOnBoard;
-		rowIndex: number;
-		pieceSquare: string;
-		pieceColor: string;
-	}
+	let nextPlayer = $state('black');
+
+	// interface EventDetails {
+	// 	piece: SquareOnBoard;
+	// 	rowIndex: number;
+	// 	pieceSquare: string;
+	// 	pieceColor: string;
+	// }
 	async function handleDrop(
 		event: string | (DragEvent & { currentTarget: EventTarget & HTMLDivElement }),
 		row: number,
 		square: SquareOnBoard
 	) {
 		// Get the piece data from the data transfer object
-		console.log(event?.dataTransfer);
-		console.log('event.dataTransfer');
+		// console.log(event?.dataTransfer);
+		// console.log('event.dataTransfer');
+		let attackMove = false;
 
 		let piece, rowIndex, pieceSquare: string, pieceColor;
 		if (!touch) {
@@ -234,33 +62,24 @@
 			attackMove = true;
 		}
 
-		// validateMove(piece, currentPos, newPos);
-		const isValidMove = validateMove(piece, currentPos, newPos); // moveValid; // true; // checkMove(board, [piecePosition], [row, square.position]);
-		// const isAttackValid = attackValid;
-		// console.log(isValidMove);
-		// console.log('isValidMove');
+		const isValidMove = validateMove(board, piece, currentPos, newPos);
 
-		// console.log(color);
-		// console.log(p);
 		if (currentPlayer === selectedColor) {
 			if (isValidMove && selectedPiece && (attackMove || square.piece === '')) {
-				// After each move, toggle the current player
-
-				// Update the board state with the new position of the piece
 				if (attackMove) {
 					const kill = board[row].piece;
-					// kills.push(kill);
-					// console.log('killed');
-					// console.log(kills);
+
 					const killBy = currentPlayer;
 					dispatch('kills', { kill, killBy });
 				}
+				const strValidMov = isValidMove.toString();
+				let upgradePiece: string | boolean = false;
 
+				upgradePiece = strValidMov?.includes('queen') === true ? isValidMove : false;
 				board[row].piece = upgradePiece !== false ? upgradePiece : piece;
 				board[rowIndex].piece = '';
-				attackMove = false;
-				moveValid = false;
-				upgradePiece = false;
+				touch = false;
+
 				if (currentPlayer === 'white') {
 					currentPlayer = 'black';
 					nextPlayer = 'white';
@@ -272,11 +91,8 @@
 				console.log('Cant move there');
 			}
 		} else {
-			// attackMove = false;
-			// moveValid = false;
 			console.log('Its not your turn');
 		}
-		moveValid = false;
 		touch = false;
 	}
 	function handleDragOver(event: DragEvent & { currentTarget: EventTarget & HTMLDivElement }) {
@@ -285,16 +101,9 @@
 	}
 
 	function handleChessTouchingEnd(event: CustomEvent) {
-		// console.log(event);
 		oldLocation = event.detail.item.oldLocation;
 		newLocation = event.detail.item.newLocation as number;
-		// console.log(oldLocation);
 		const square = board[newLocation];
-		// console.log(newLocation);
-		// console.log('newLocation');
-
-		// console.log(square);
-
 		touch = true;
 		handleDrop(oldLocation, newLocation, square);
 	}
@@ -315,7 +124,7 @@
 			<!-- {rowIndex}
 			{square.square} -->
 			<div
-				role="application"
+				role="figure"
 				class="square {square.color}"
 				ondrop={(event) => handleDrop(event, rowIndex, square)}
 				ondragover={(event) => handleDragOver(event)}

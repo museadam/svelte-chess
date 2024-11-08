@@ -3,7 +3,7 @@
 	import ChessBoard from '$routes/ChessBoard.svelte';
 	import type { SquareOnBoard } from '$types/board.ts';
 	import { spring } from 'svelte/motion';
-	import { setBoard } from '$lib/utils/board/board';
+	import { setBoard } from '$src/lib/utils/board';
 
 	let startBoard: SquareOnBoard[] = $state.raw(setBoard());
 	let board: SquareOnBoard[] = $state(setBoard());
@@ -16,8 +16,16 @@
 	let theirKills = $state(0);
 	let theirKillsArr = $state([]);
 
+	function restartGame() {
+		myKills = 0;
+		theirKills = 0;
+		myKillsArr = [];
+		theirKillsArr = [];
+		board = startBoard;
+	}
+
 	function handleKill(event: CustomEvent) {
-		event.preventDefault();
+		// event.preventDefault();
 		// console.log(event);
 		let tempKills;
 		tempKills = event.detail.killBy;
@@ -30,7 +38,7 @@
 		}
 		if (event.detail.kill === 'white-king' || event.detail.kill === 'black-king') {
 			alert('YOU WIN!');
-			board = startBoard;
+			restartGame();
 		}
 	}
 
@@ -50,9 +58,6 @@
 	});
 	let offset = $derived(modulo($displayed_count, 1));
 	let offset2 = $derived(modulo($their_displayed_count, 1));
-	function restartGame() {
-		board = startBoard;
-	}
 
 	onMount(() => {
 		const squares = document.querySelectorAll('.chess-row');

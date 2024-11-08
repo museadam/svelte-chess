@@ -3,7 +3,7 @@
 
 	// export let column;
 	import { createEventDispatcher } from 'svelte';
-	import type { TouchEventHandler } from 'svelte/elements';
+	// import type { TouchEventHandler } from 'svelte/elements';
 	interface Props {
 		rowIndex: number;
 		newRowIndex: any;

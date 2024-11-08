@@ -11,3 +11,5 @@ export type Coord = {
 };
 
 export type Colors = 'dark' | 'light';
+
+export type ValidMove = [number, number, 'move' | 'attack'] | undefined;
