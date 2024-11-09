@@ -59,7 +59,7 @@ export function getRowAndColumn(square: string): number[] {
 	const row = 7 - rank;
 	return [row, column];
 }
-export function getSquareFromRC(square: number[]): string {
+export function getSquareFromRC(square: number[]) {
 	const [row, column] = square;
 	const file = String.fromCharCode(column + 97); // Convert column to file letter (a-h)
 	const rank = 8 - row; // Convert row to rank number (1-8)

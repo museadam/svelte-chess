@@ -1,16 +1,18 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, tick } from 'svelte';
 	const dispatch = createEventDispatcher();
 	import ChessPiece from '$routes/ChessPiece.svelte';
 	import type { SquareOnBoard, ValidMove } from '$types/board';
 	import { getRowAndColumn } from '$lib/utils/moves';
 	import { calcMoves, validateMove } from '$lib/utils/moves/validate';
+	import { findBestMove } from '$src/lib/utils/minmax';
 
 	interface Props {
 		board: SquareOnBoard[];
+		botBoard: SquareOnBoard[];
 	}
 
-	let { board = $bindable() }: Props = $props();
+	let { board = $bindable(), botBoard = $bindable() }: Props = $props();
 	let newRowIndex: string = $state('');
 
 	let newLocation: number | undefined = $state(); // index
@@ -26,6 +28,28 @@
 	// 	pieceSquare: string;
 	// 	pieceColor: string;
 	// }
+	function moveBot(move) {
+		const moveI = board.findIndex((element) => element.square === move?.from.square);
+		const newI = board.findIndex((element) => element.square === move?.to.sq);
+
+		// console.log(move.to);
+		// console.log(move);
+
+		if (move?.to.moveT === 'attack') {
+			const kill = board[newI].piece;
+
+			const killBy = currentPlayer;
+			dispatch('kills', { kill, killBy });
+		}
+
+		board[newI].piece = move?.from.piece;
+		board[moveI].piece = '';
+		board[moveI].potentialMoves = [];
+		botBoard[newI].piece = move?.from.piece;
+		botBoard[moveI].piece = '';
+		botBoard[moveI].potentialMoves = [];
+	}
+
 	async function handleDrop(
 		event: string | (DragEvent & { currentTarget: EventTarget & HTMLDivElement }),
 		row: number,
@@ -78,10 +102,20 @@
 				board[row].piece = upgradePiece !== false ? upgradePiece : piece;
 				board[rowIndex].piece = '';
 				board[rowIndex].potentialMoves = [];
-
+				botBoard[row].piece = upgradePiece !== false ? upgradePiece : piece;
+				botBoard[rowIndex].piece = '';
+				botBoard[rowIndex].potentialMoves = [];
 				touch = false;
 				// recalculate all moves for bot
-				calcMoves(board);
+				calcMoves(botBoard);
+
+				if (selectedColor === 'white') {
+					currentPlayer = 'black';
+
+					const bes = findBestMove(botBoard, 3, 'black');
+					moveBot(bes);
+					calcMoves(botBoard);
+				}
 
 				if (currentPlayer === 'white') {
 					currentPlayer = 'black';
@@ -98,6 +132,7 @@
 		}
 		touch = false;
 	}
+
 	function handleDragOver(event: DragEvent & { currentTarget: EventTarget & HTMLDivElement }) {
 		event.preventDefault();
 		if (event?.dataTransfer) event.dataTransfer.dropEffect = 'drop';

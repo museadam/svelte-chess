@@ -46,8 +46,8 @@ export function validateMove(
 		default:
 			break;
 	}
-	console.log(moveValid);
-	console.log('moveValid');
+	// console.log(moveValid);
+	// console.log('moveValid');
 	return moveValid;
 }
 

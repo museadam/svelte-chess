@@ -5,13 +5,14 @@
 	import { spring } from 'svelte/motion';
 	import { setBoard } from '$src/lib/utils/board';
 	import { calcMoves } from '$lib/utils/moves/validate';
-	import { getRowAndColumn } from '$src/lib/utils/moves';
+	import { findBestMove } from '$src/lib/utils/minmax';
 
 	let startBoard: SquareOnBoard[] = $state.raw(setBoard());
 	let board: SquareOnBoard[] = $state(setBoard());
+	let botBoard: SquareOnBoard[] = $state.raw(setBoard());
 
 	// $inspect(board[0]);
-	$inspect(board);
+	// $inspect(botBoard);
 
 	let myKills = $state(0);
 	let myKillsArr = $state([]);
@@ -25,7 +26,9 @@
 		myKillsArr = [];
 		theirKillsArr = [];
 		board = startBoard;
-		calcMoves(board);
+		botBoard = startBoard;
+		// calcMoves(board);
+		calcMoves(botBoard);
 	}
 
 	async function handleKill(event: CustomEvent) {
@@ -41,7 +44,7 @@
 			theirKills += 1;
 		}
 		if (event.detail.kill === 'white-king' || event.detail.kill === 'black-king') {
-			// alert('YOU WIN!');
+			alert('YOU WIN!');
 			await tick();
 			restartGame();
 		}
@@ -82,8 +85,11 @@
 			// convert str to num to stop type errors
 			if (row) board[+row] = { ...board[+row], coordinates };
 			if (row) startBoard[+row] = { ...startBoard[+row], coordinates };
+			if (row) botBoard[+row] = { ...botBoard[+row], coordinates };
 		});
-		calcMoves(board);
+		calcMoves(botBoard);
+		// const bes = findBestMove(botBoard, 3, 'black');
+		// console.log(bes);
 	});
 </script>
 
@@ -99,7 +105,7 @@
 			</div>
 		</div>
 	</div>
-	<ChessBoard bind:board on:kills={(e) => handleKill(e)} />
+	<ChessBoard bind:board bind:botBoard on:kills={(e) => handleKill(e)} />
 
 	<div class="gradient-border score-card">
 		<div class="player-name">White Player</div>
