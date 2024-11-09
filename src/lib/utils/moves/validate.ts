@@ -1,4 +1,4 @@
-import type { SquareOnBoard, ValidMove } from '$types/board';
+import type { MoveHistory, SquareOnBoard, ValidMove } from '$types/board';
 
 import {
 	getValidMovesForRook,
@@ -13,9 +13,10 @@ export function validateMove(
 	board: SquareOnBoard[],
 	piece: string,
 	currentPos: number[],
+	moveHistory: MoveHistory[],
 	newPos?: number[]
-): boolean | ValidMove[] {
-	let moveValid = false;
+): boolean | string | ValidMove[] {
+	let moveValid: boolean | any = false;
 	const pieceSelect =
 		piece.includes('pawn') === true ? piece : piece.replace(/^(white-|black-)/, '');
 
@@ -41,7 +42,7 @@ export function validateMove(
 				: getQueenMoves(board, currentPos);
 			break;
 		case 'king':
-			moveValid = kingMove(board, currentPos, newPos);
+			moveValid = kingMove(board, currentPos, moveHistory, newPos);
 			break;
 		default:
 			break;
@@ -65,12 +66,12 @@ function validateQueenMove(board: SquareOnBoard[], currentPos: number[], newPos?
 		: true;
 }
 
-export function calcMoves(board: SquareOnBoard[]) {
+export function calcMoves(board: SquareOnBoard[], moveHistory: MoveHistory[]) {
 	for (let i = 0; i < board.length; i++) {
 		if (board[i].piece !== '') {
 			const currentPos = getRowAndColumn(board[i].square);
 			const currentPiece = board[i].piece;
-			board[i].potentialMoves = validateMove(board, currentPiece, currentPos) as
+			board[i].potentialMoves = validateMove(board, currentPiece, currentPos, moveHistory) as
 				| ValidMove[]
 				| undefined;
 		}

@@ -1,18 +1,19 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import ChessBoard from '$routes/ChessBoard.svelte';
-	import type { SquareOnBoard } from '$types/board.ts';
+	import type { MoveHistory, SquareOnBoard } from '$types/board.ts';
 	import { spring } from 'svelte/motion';
 	import { setBoard } from '$src/lib/utils/board';
 	import { calcMoves } from '$lib/utils/moves/validate';
-	import { findBestMove } from '$src/lib/utils/minmax';
+	// import { findBestMove } from '$src/lib/utils/minmax';
 
 	let startBoard: SquareOnBoard[] = $state.raw(setBoard());
 	let board: SquareOnBoard[] = $state(setBoard());
-	let botBoard: SquareOnBoard[] = $state.raw(setBoard());
+	// let botBoard: SquareOnBoard[] = $state(setBoard());
+	let moveHistory: MoveHistory[] = $state([]);
 
 	// $inspect(board[0]);
-	// $inspect(botBoard);
+	// $inspect(moveHistory);
 
 	let myKills = $state(0);
 	let myKillsArr = $state([]);
@@ -26,9 +27,9 @@
 		myKillsArr = [];
 		theirKillsArr = [];
 		board = startBoard;
-		botBoard = startBoard;
+		// botBoard = startBoard;
 		// calcMoves(board);
-		calcMoves(botBoard);
+		calcMoves(board, []);
 	}
 
 	async function handleKill(event: CustomEvent) {
@@ -43,8 +44,12 @@
 			theirKillsArr.push(event.detail.kill);
 			theirKills += 1;
 		}
-		if (event.detail.kill === 'white-king' || event.detail.kill === 'black-king') {
+		if (event.detail.kill === 'black-king') {
 			alert('YOU WIN!');
+			await tick();
+			restartGame();
+		} else if (event.detail.kill === 'white-king') {
+			alert('YOU LOSE!');
 			await tick();
 			restartGame();
 		}
@@ -85,9 +90,9 @@
 			// convert str to num to stop type errors
 			if (row) board[+row] = { ...board[+row], coordinates };
 			if (row) startBoard[+row] = { ...startBoard[+row], coordinates };
-			if (row) botBoard[+row] = { ...botBoard[+row], coordinates };
+			// if (row) botBoard[+row] = { ...botBoard[+row], coordinates };
 		});
-		calcMoves(botBoard);
+		calcMoves(board, []);
 		// const bes = findBestMove(botBoard, 3, 'black');
 		// console.log(bes);
 	});
@@ -105,7 +110,7 @@
 			</div>
 		</div>
 	</div>
-	<ChessBoard bind:board bind:botBoard on:kills={(e) => handleKill(e)} />
+	<ChessBoard bind:board bind:moveHistory on:kills={(e) => handleKill(e)} />
 
 	<div class="gradient-border score-card">
 		<div class="player-name">White Player</div>

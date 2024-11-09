@@ -2,18 +2,19 @@
 	import { createEventDispatcher, tick } from 'svelte';
 	const dispatch = createEventDispatcher();
 	import ChessPiece from '$routes/ChessPiece.svelte';
-	import type { SquareOnBoard, ValidMove } from '$types/board';
-	import { getRowAndColumn } from '$lib/utils/moves';
+	import type { MoveHistory, SquareOnBoard, ValidMove } from '$types/board';
+	import { getRowAndColumn, getSquareFromRC } from '$lib/utils/moves';
 	import { calcMoves, validateMove } from '$lib/utils/moves/validate';
 	import { findBestMove } from '$src/lib/utils/minmax';
 
 	interface Props {
 		board: SquareOnBoard[];
-		botBoard: SquareOnBoard[];
+		moveHistory: MoveHistory[];
 	}
 
-	let { board = $bindable(), botBoard = $bindable() }: Props = $props();
+	let { board = $bindable(), moveHistory = $bindable() }: Props = $props();
 	let newRowIndex: string = $state('');
+	// $inspect(botBoard);
 
 	let newLocation: number | undefined = $state(); // index
 	let oldLocation = $state('');
@@ -34,20 +35,32 @@
 
 		// console.log(move.to);
 		// console.log(move);
+		let removedPiece;
 
 		if (move?.to.moveT === 'attack') {
 			const kill = board[newI].piece;
-
+			removedPiece = kill;
 			const killBy = currentPlayer;
 			dispatch('kills', { kill, killBy });
 		}
+		const moveItem: MoveHistory = {
+			to: move?.to.sq,
+			from: move?.from.square,
+			movedPiece: move?.piece,
+			removedPiece
+		};
+		// console.log(moveItem);
+		// console.log('bots moveItem');
+
+		moveHistory.push(moveItem);
+		// const moves = [...$state.snapshot(moveHistory)];
 
 		board[newI].piece = move?.from.piece;
 		board[moveI].piece = '';
 		board[moveI].potentialMoves = [];
-		botBoard[newI].piece = move?.from.piece;
-		botBoard[moveI].piece = '';
-		botBoard[moveI].potentialMoves = [];
+		// botBoard[newI].piece = move?.from.piece;
+		// botBoard[moveI].piece = '';
+		// botBoard[moveI].potentialMoves = [];
 	}
 
 	async function handleDrop(
@@ -86,35 +99,101 @@
 			attackMove = true;
 		}
 
-		const isValidMove = validateMove(board, piece, currentPos, newPos);
+		const isValidMove = validateMove(board, piece, currentPos, moveHistory, newPos);
 
 		if (currentPlayer === selectedColor) {
-			if (isValidMove && selectedPiece && (attackMove || square.piece === '')) {
+			if (
+				isValidMove &&
+				selectedPiece &&
+				(attackMove || square.piece === '' || isValidMove === 'castle')
+			) {
+				let removedPiece;
 				if (attackMove) {
 					const kill = board[row].piece;
-
+					removedPiece = kill;
 					const killBy = currentPlayer;
 					dispatch('kills', { kill, killBy });
 				}
 				const strValidMov = isValidMove.toString();
 				let upgradePiece: boolean | ValidMove[] = false;
 				upgradePiece = strValidMov?.includes('queen') === true ? isValidMove : false;
-				board[row].piece = upgradePiece !== false ? upgradePiece : piece;
+
+				let castleIt: boolean | ValidMove[] = false;
+
+				if (isValidMove) castleIt = strValidMov?.includes('castle') === true ? true : false;
+				if (castleIt) {
+					let rookSq;
+					let kingSq;
+					switch (square.square) {
+						case 'h1':
+							rookSq = [newPos[0], newPos[1] - 2];
+							kingSq = [newPos[0], newPos[1] - 1];
+							break;
+						case 'a1':
+							rookSq = [newPos[0], newPos[1] + 2];
+							kingSq = [newPos[0], newPos[1] + 1];
+							break;
+						case 'a8':
+							rookSq = [newPos[0], newPos[1] + 2];
+							kingSq = [newPos[0], newPos[1] + 1];
+							break;
+						case 'h8':
+							rookSq = [newPos[0], newPos[1] - 2];
+							kingSq = [newPos[0], newPos[1] - 1];
+							break;
+						default:
+							break;
+					}
+
+					const newKingSq = getSquareFromRC(kingSq);
+					const newRookSq = getSquareFromRC(rookSq);
+
+					const indexKing = board.findIndex((element) => element.square === newKingSq);
+					const indexRook = board.findIndex((element) => element.square === newRookSq);
+
+					board[row].piece = '';
+					board[row].potentialMoves = [];
+					board[indexKing].piece = 'white-king';
+					board[indexRook].piece = 'white-rook';
+				} else {
+					board[row].piece = upgradePiece !== false ? upgradePiece : piece;
+				}
 				board[rowIndex].piece = '';
 				board[rowIndex].potentialMoves = [];
-				botBoard[row].piece = upgradePiece !== false ? upgradePiece : piece;
-				botBoard[rowIndex].piece = '';
-				botBoard[rowIndex].potentialMoves = [];
+				// botBoard[row].piece = upgradePiece !== false ? upgradePiece : piece;
+				// botBoard[rowIndex].piece = '';
+				// botBoard[rowIndex].potentialMoves = [];
 				touch = false;
+				const moveItem: MoveHistory = {
+					to: square.square,
+					from: pieceSquare,
+					movedPiece: board[row].piece,
+					removedPiece
+				};
+				// console.log(moveItem);
+				// console.log('moveItem');
+				// console.log(moveHistory);
+				// console.log('moveHistory1');
+
+				moveHistory.push(moveItem);
+				const moves = [...$state.snapshot(moveHistory)];
+				// console.log(moves);
+				// console.log('moves');
 				// recalculate all moves for bot
-				calcMoves(botBoard);
+
+				calcMoves(board, moves);
+				// console.log('calcMoves after1');
 
 				if (selectedColor === 'white') {
 					currentPlayer = 'black';
+					// console.log('computer player');
 
-					const bes = findBestMove(botBoard, 3, 'black');
+					const bes = findBestMove(board, 2, 'black', moveHistory);
 					moveBot(bes);
-					calcMoves(botBoard);
+					// console.log('calcMoves before2');
+					// await tick();
+					calcMoves(board, [...$state.snapshot(moveHistory)]);
+					// console.log('calcMoves after2');
 				}
 
 				if (currentPlayer === 'white') {
@@ -159,14 +238,18 @@
 <div class="chess-board">
 	{#each board as square, rowIndex}
 		<div class="chess-row" aria-label={rowIndex.toString()}>
-			<!-- {rowIndex}
-			{square.square} -->
+			<!-- {#if rowIndex < 8}
+				<p class="squareLabel top-0">{square.square}</p>
+			{/if} -->
+
 			<div
 				role="figure"
 				class="square {square.color}"
 				ondrop={(event) => handleDrop(event, rowIndex, square)}
 				ondragover={(event) => handleDragOver(event)}
 			>
+				<p class="squareLabel top-0">{square.square}</p>
+
 				{#if square.piece}
 					<ChessPiece
 						{square}
@@ -193,6 +276,14 @@
 		-ms-user-select: none;
 		user-select: none;
 	} */
+
+	.squareLabel {
+		position: absolute;
+		font-size: 0.66rem; /* 14px */
+		line-height: 1.1rem; /* 20px */
+		top: -12px;
+		left: 2px;
+	}
 	.m-2 {
 		margin: 0.5rem; /* 4px */
 		margin-top: 0.8rem;
@@ -233,7 +324,11 @@
 	.chess-piece:active {
 		opacity: 0.5;
 	}
+	.chess-row {
+	}
 	.square {
+		position: relative;
+
 		width: 40px;
 		height: 40px;
 		display: flex;
