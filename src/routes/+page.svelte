@@ -12,7 +12,7 @@
 	// let botBoard: SquareOnBoard[] = $state(setBoard());
 	let moveHistory: MoveHistory[] = $state([]);
 
-	// $inspect(board[0]);
+	// $inspect(board);
 	// $inspect(moveHistory);
 
 	let myKills = $state(0);

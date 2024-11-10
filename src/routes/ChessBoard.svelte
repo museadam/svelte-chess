@@ -175,20 +175,24 @@
 				// console.log(moveHistory);
 				// console.log('moveHistory1');
 
-				moveHistory.push(moveItem);
-				const moves = [...$state.snapshot(moveHistory)];
+				// moveHistory.push(moveItem);
+
+				moveHistory = [...moveHistory, moveItem];
+				// const moves = [...$state.snapshot(moveHistory)];
 				// console.log(moves);
 				// console.log('moves');
 				// recalculate all moves for bot
 
-				calcMoves(board, moves);
+				calcMoves(board, moveHistory);
 				// console.log('calcMoves after1');
 
 				if (selectedColor === 'white') {
 					currentPlayer = 'black';
 					// console.log('computer player');
+					// console.log([...$state.snapshot(board)]);
+					// console.log('board');
 
-					const bes = findBestMove(board, 2, 'black', moveHistory);
+					const bes = findBestMove([...$state.snapshot(board)], 2, 'black', moveHistory);
 					moveBot(bes);
 					// console.log('calcMoves before2');
 					// await tick();

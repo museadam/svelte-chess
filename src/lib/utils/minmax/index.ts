@@ -1,5 +1,5 @@
 import type { MoveHistory, SquareOnBoard, ValidMove } from '$types/board';
-import { getSquareFromRC } from '../moves';
+import { getSquareFromRC, getRowAndColumn } from '../moves';
 import { calcMoves } from '../moves/validate';
 
 //  version 1
@@ -315,23 +315,48 @@ function isGameOver(board: SquareOnBoard[]): boolean {
 // }
 
 type Move = {
-	from: SquareOnBoard; // starting square in chess notation, e.g., "e2"
-	to: string; // target square in chess notation, e.g., "e4"
-	// piece: string; // the piece being moved, e.g., "white-pawn"
+	// move: string;
+	// moveT: string;
+	from: string;
+	to: string;
+	piece: string;
 };
 
 export function findBestMove(
-	board: SquareOnBoard[],
+	b: SquareOnBoard[],
 	depth: number,
 	color: 'white' | 'black',
 	moveHistory: MoveHistory[]
 ): Move | null {
 	let bestMove: Move | null = null;
 	let bestValue = color === 'white' ? -Infinity : Infinity;
-	// const stds = structuredClone(b);
-	// const board = [...stds];
-	// console.log(color);
-	// console.log('finding BestMove');
+	const board = [...b];
+	// console.log(board);
+
+	if ([...moveHistory].length < 4) {
+		const moves = useOpeningMove();
+
+		let len = [...moveHistory].length - 1;
+		// console.log(len);
+		// console.log('len');
+		if (len === 2) len - 1;
+		let move = moves[len];
+		if (move.length > 2) move = move[1] + move[2];
+		// console.log(move);
+		// console.log('move');
+		if (color === 'black') move = getMirroredSquare(move);
+		// console.log(move);
+		// console.log('move');
+		const sq = getMovePiece(board, color, move);
+
+		// console.log(sq);
+		// console.log('sq');
+		return (bestMove = {
+			from: { ...sq }, // starting position in chess notation
+			to: { sq: move, moveT: 'move' }, // target position in chess notation
+			piece: sq
+		});
+	}
 
 	for (const square of board) {
 		if (square.piece?.startsWith(color) && square?.potentialMoves) {
@@ -339,9 +364,6 @@ export function findBestMove(
 				const newBoard = makeMove(board, square, move, moveHistory);
 
 				const boardValue = minimax(newBoard, depth - 1, color === 'black', moveHistory);
-				// console.log(newBoard);
-				// console.log(boardValue);
-				// console.log(bestValue);
 
 				// Update best move based on maximizing or minimizing player
 				if (
@@ -355,21 +377,167 @@ export function findBestMove(
 					// console.log('piece');
 					bestValue = boardValue;
 					if (!square?.piece) continue;
-
+					// if (!square.piece?.includes('pawn')) {
+					// 	const sq = square.piece?.replace(/^(white-|black-)/, '');
+					// 	let letter = '';
+					// 	letter = square.piece?.includes('knight') === true ? 'N' : sq.charAt(0).toUpperCase();
+					// 	console.log(letter);
+					// 	bestMove = {
+					// 		move: letter + square.square,
+					// 		moveT: move[2]
+					// 	};
+					// }
+					// bestMove = {
+					// 	move: square.square,
+					// 	moveT: move[2]
+					// };
 					bestMove = {
 						from: { ...square }, // starting position in chess notation
 						to: { sq: getSquareFromRC([move[0], move[1]]), moveT: move[2] }, // target position in chess notation
 						piece: square.piece
 					};
-					// console.log(bestMove);
-					// console.log('bestMove1');
-					// break;
 				}
 			}
 		}
 	}
 
-	// console.log(bestMove);
-	// console.log('bestMove2');
 	return bestMove;
+}
+
+function useOpeningMove() {
+	// use a random open move
+	const move = getRandomInt(openingMoves.length) - 1;
+	return openingMoves[move];
+}
+
+const openingMoves = [
+	// queens open
+	// 	Trompowsky: 1.d4  2.Bg5.
+	['d4', 'Bg5'],
+	// London System: 1.d4  2.Nf3.
+	['d4', 'Nf3'],
+
+	// Colle System: 1.d4 2.Nf3 3.Bf4.
+	['d4', 'Nf3', 'Bf4'],
+
+	// Torre Attack:  1.d4  2.Nf3 3.Bg5.
+	['d4', 'Nf3', 'Bg5'],
+
+	// kings open
+	// Ruy Lopez: 1.e4  2.Nf3  3.Bb5 (or 3.Bc4)
+	['e4', 'Nf3', 'Bb5'],
+	['e4', 'Nf3', 'Bc4'],
+
+	// Italian Game: 1.e4  2.Nf3  3.Bc4
+	['e4', 'Nf3', 'Bc5'],
+
+	// Vienna Game: 1.e4  2.Nf3  3.Nc3
+	['e4', 'Nf3', 'Nc3'],
+
+	// King’s Gambit: 1.e4  2.f4 (or 2.d4)
+	['e4', 'f4'],
+	['e4', 'd4'],
+
+	// other
+	['c4', 'Nf3']
+];
+
+function getRandomInt(max: number) {
+	return Math.floor(Math.random() * (max + 1));
+}
+
+function getMirroredSquare(square: string): string {
+	const file = square[0]; // Get the file (e.g., 'e' from 'e6')
+	const rank = parseInt(square[1]); // Get the rank as an integer (e.g., 6 from 'e6')
+
+	// Mirror the rank (8 - current rank + 1)
+	const mirroredRank = 9 - rank;
+
+	// Return the mirrored square
+	return `${file}${mirroredRank}`;
+}
+
+function getMovePiece(board: SquareOnBoard[], color: string, move: string) {
+	let letter = 'p';
+	// console.log(move);
+	// console.log('move');
+
+	if (move.length > 2) letter = move[0].toLocaleLowerCase();
+
+	// if (letter === 'n') letter = 'k';
+	// find piece name by first letter
+	// console.log(letter);
+
+	let piece = getPieceByLetter(letter);
+	// console.log(piece);
+	piece = `${color}-${piece}`;
+	//	const sq = square.piece?.replace(/^(white-|black-)/, '');
+	// 	let letter = '';
+	// 	letter = square.piece?.includes('knight') === true ? 'N' : sq.charAt(0).toUpperCase();
+	// console.log(piece);
+	// console.log('piece');
+	const rc = getRowAndColumn(move);
+	// console.log(rc);
+	// console.log('rc');
+
+	// if (move.length === 2) {
+	// 	piece = board.find((el) => el.square === move);
+	// 	// piece = piece.piece;
+	// }
+	// console.log(piece);
+	// console.log('piece');
+	let filteredPieces;
+	filteredPieces = [...board.filter((el) => el.piece === piece)];
+	// if (move.length > 2)
+	// else filteredPieces = board.filter((el) => el.square === move);
+	// console.log(filteredPieces);
+	// console.log('filteredPieces');
+
+	let square2;
+	for (const move of filteredPieces) {
+		// console.log(move);
+		// console.log('move');
+		if (move?.potentialMoves) {
+			// console.log(potentialMoves);
+			// console.log('potentialMoves');
+			// console.log(rc);
+			// console.log('rc');
+
+			for (const potentialMoves of move.potentialMoves) {
+				if (potentialMoves[0] === rc[0] && potentialMoves[1] === rc[1]) {
+					square2 = move;
+				}
+			}
+			// console.log(square2);
+			// console.log('square2');
+		}
+	}
+	return square2;
+}
+
+function getPieceByLetter(letter: string) {
+	let ret;
+	switch (letter) {
+		case 'p':
+			ret = 'pawn';
+			break;
+		case 'r':
+			ret = 'rook';
+			break;
+		case 'n':
+			ret = 'knight';
+			break;
+		case 'b':
+			ret = 'bishop';
+			break;
+		case 'q':
+			ret = 'queen';
+			break;
+		case 'k':
+			ret = 'king';
+			break;
+		default:
+			break;
+	}
+	return ret;
 }

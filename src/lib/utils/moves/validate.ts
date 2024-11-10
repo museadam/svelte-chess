@@ -69,6 +69,7 @@ function validateQueenMove(board: SquareOnBoard[], currentPos: number[], newPos?
 export function calcMoves(board: SquareOnBoard[], moveHistory: MoveHistory[]) {
 	for (let i = 0; i < board.length; i++) {
 		if (board[i].piece !== '') {
+			// console.log('getting mvoes for ' + board[i].piece);
 			const currentPos = getRowAndColumn(board[i].square);
 			const currentPiece = board[i].piece;
 			board[i].potentialMoves = validateMove(board, currentPiece, currentPos, moveHistory) as
