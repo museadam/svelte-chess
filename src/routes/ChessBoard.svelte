@@ -252,7 +252,7 @@
 				ondrop={(event) => handleDrop(event, rowIndex, square)}
 				ondragover={(event) => handleDragOver(event)}
 			>
-				<p class="squareLabel top-0">{square.square}</p>
+				<!-- <p class="squareLabel top-0">{square.square}</p> -->
 
 				{#if square.piece}
 					<ChessPiece
@@ -329,10 +329,9 @@
 		opacity: 0.5;
 	}
 	.chess-row {
+		/* position: relative; */
 	}
 	.square {
-		position: relative;
-
 		width: 40px;
 		height: 40px;
 		display: flex;
