@@ -149,8 +149,8 @@ export function kingMove(
 	// console.log(ret);
 	// let basic move check
 	if (newRow && newCol) {
-		console.log(newPos);
-		console.log('newPos');
+		// console.log(newPos);
+		// console.log('newPos');
 
 		// if ()
 
@@ -184,9 +184,10 @@ export function kingMove(
 		// console.log('item');
 		// console.log(check);
 		// console.log('check');
-		const castler = item[0][2] ?? false;
 		if (check) {
-			console.log('found a castle move');
+			const castler = item[0][2] ?? false;
+
+			// console.log('found a castle move');
 			const ret = castler === 'castle' ? 'castle' : true;
 
 			return ret;

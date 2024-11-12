@@ -178,7 +178,7 @@
 				moveHistory = [...moveHistory, moveItem];
 				// const moves = [...$state.snapshot(moveHistory)];
 				// console.log(moves);
-				console.log('re calc moves');
+				// console.log('re calc moves');
 				// recalculate all moves for bot
 
 				calcMoves(board, moveHistory);
@@ -194,7 +194,7 @@
 					// console.log(botCurrentMove);
 
 					if (bmL < botCurrentMove + 1) {
-						console.log('no more moves');
+						// console.log('no more moves');
 						bes = findBestMove([...$state.snapshot(board)], 2, 'black', moveHistory);
 					} else {
 						bes = getBotStarterMoves('black');
