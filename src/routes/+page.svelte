@@ -20,6 +20,8 @@
 
 	let theirKills = $state(0);
 	let theirKillsArr = $state([]);
+	let startGame = $state(false);
+	let cpu = $state(false);
 
 	function restartGame() {
 		myKills = 0;
@@ -99,28 +101,62 @@
 </script>
 
 <div class="sheet">
-	<button class="btn gradient-border" onclick={restartGame}> Restart </button>
+	{#if startGame}
+		<button class="btn gradient-border" onclick={restartGame}> Restart </button>
 
-	<div class="gradient-border score-card">
-		<div class="player-name">Black Player</div>
-		<div class="counter-viewport">
-			<div class="counter-digits" style="transform: translate(0, {100 * offset2}%)">
-				<strong class="hidden" aria-hidden="true">{Math.floor($their_displayed_count + 1)}</strong>
-				<strong>{Math.floor($their_displayed_count)}</strong>
+		<div class="gradient-border score-card">
+			<div class="player-name">Black Player</div>
+			<div class="counter-viewport">
+				<div class="counter-digits" style="transform: translate(0, {100 * offset2}%)">
+					<strong class="hidden" aria-hidden="true">{Math.floor($their_displayed_count + 1)}</strong
+					>
+					<strong>{Math.floor($their_displayed_count)}</strong>
+				</div>
 			</div>
 		</div>
-	</div>
-	<ChessBoard bind:board bind:moveHistory on:kills={(e) => handleKill(e)} />
+		<ChessBoard bind:board bind:moveHistory {cpu} on:kills={(e) => handleKill(e)} />
 
-	<div class="gradient-border score-card">
-		<div class="player-name">White Player</div>
-		<div class="counter-viewport">
-			<div class="counter-digits" style="transform: translate(0, {100 * offset}%)">
-				<strong class="hidden" aria-hidden="true">{Math.floor($displayed_count + 1)}</strong>
-				<strong>{Math.floor($displayed_count)}</strong>
+		<div class="gradient-border score-card">
+			<div class="player-name">White Player</div>
+			<div class="counter-viewport">
+				<div class="counter-digits" style="transform: translate(0, {100 * offset}%)">
+					<strong class="hidden" aria-hidden="true">{Math.floor($displayed_count + 1)}</strong>
+					<strong>{Math.floor($displayed_count)}</strong>
+				</div>
 			</div>
 		</div>
-	</div>
+	{/if}
+	{#if !startGame}
+		<div
+			tabindex="0"
+			role="button"
+			class="gradient-border score-card startBtn"
+			onclick={() => {
+				startGame = true;
+				cpu = false;
+			}}
+			onkeypress={(e) => {
+				if (e.key === 'Shift+c') startGame = true;
+			}}
+		>
+			<div class="player-name">Player vs Player</div>
+		</div>
+
+		<div
+			tabindex="0"
+			role="button"
+			class="gradient-border score-card startBtn"
+			onclick={() => {
+				startGame = true;
+				cpu = true;
+			}}
+			onkeypress={(e) => {
+				if (e.key === 'Shift+c') startGame = true;
+			}}
+		>
+			<div class="player-name">Player vs CPU</div>
+		</div>
+	{/if}
 </div>
 
 <!-- <div>
@@ -134,6 +170,9 @@
 </div> -->
 
 <style>
+	.startBtn {
+		cursor: pointer;
+	}
 	.btn {
 		all: unset;
 		display: flex;

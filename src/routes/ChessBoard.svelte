@@ -6,18 +6,16 @@
 	import { getRowAndColumn, getSquareFromRC } from '$lib/utils/moves';
 	import { calcMoves, validateMove } from '$lib/utils/moves/validate';
 	import { findBestMove } from '$src/lib/utils/minmax';
-	import {
-		getMirroredSquare,
-		getMovePiece,
-		useOpeningMove
-	} from '$src/lib/utils/bot/starter-moves';
+	import { getMovePiece, useOpeningMove } from '$src/lib/utils/bot/starter-moves';
+	import Page from './+page.svelte';
 
 	interface Props {
 		board: SquareOnBoard[];
 		moveHistory: MoveHistory[];
+		cpu: boolean;
 	}
 
-	let { board = $bindable(), moveHistory = $bindable() }: Props = $props();
+	let { board = $bindable(), moveHistory = $bindable(), cpu }: Props = $props();
 	let newRowIndex: string = $state('');
 	// $inspect(botBoard);
 
@@ -39,8 +37,6 @@
 		const moveI = board.findIndex((element) => element.square === move?.from.square);
 		const newI = board.findIndex((element) => element.square === move?.to.sq);
 
-		// console.log(move.to);
-		// console.log(move);
 		let removedPiece;
 
 		if (move?.to.moveT === 'attack') {
@@ -55,18 +51,12 @@
 			movedPiece: move?.piece,
 			removedPiece
 		};
-		// console.log(moveItem);
-		// console.log('bots moveItem');
 
 		moveHistory.push(moveItem);
-		// const moves = [...$state.snapshot(moveHistory)];
 
 		board[newI].piece = move?.from.piece;
 		board[moveI].piece = '';
 		board[moveI].potentialMoves = [];
-		// botBoard[newI].piece = move?.from.piece;
-		// botBoard[moveI].piece = '';
-		// botBoard[moveI].potentialMoves = [];
 	}
 
 	async function handleDrop(
@@ -176,34 +166,23 @@
 				};
 
 				moveHistory = [...moveHistory, moveItem];
-				// const moves = [...$state.snapshot(moveHistory)];
-				// console.log(moves);
-				// console.log('re calc moves');
-				// recalculate all moves for bot
 
 				calcMoves(board, moveHistory);
-				// console.log('calcMoves after1');
 
-				if (selectedColor === 'white') {
+				if (selectedColor === 'white' && cpu) {
 					currentPlayer = 'black';
 
 					let bes;
 
 					let bmL = [...$state.snapshot(botMoves)].length;
-					// console.log(bmL);
-					// console.log(botCurrentMove);
 
 					if (bmL < botCurrentMove + 1) {
-						// console.log('no more moves');
 						bes = findBestMove([...$state.snapshot(board)], 2, 'black', moveHistory);
 					} else {
 						bes = getBotStarterMoves('black');
 					}
 					moveBot(bes);
-					// console.log('calcMoves before2');
-					// await tick();
 					calcMoves(board, moveHistory);
-					// console.log('calcMoves after2');
 				}
 
 				if (currentPlayer === 'white') {
@@ -228,24 +207,17 @@
 	}
 	function setBotStarterMoves() {
 		const moves = useOpeningMove();
-		// if (botMoves.length <= 0) botMoves = [...moves];
 		return moves;
 	}
 	function getBotStarterMoves(color: string) {
 		let move = botMoves[botCurrentMove];
-		// console.log(move);
-		// console.log('move');
 		const { square, mv } = getMovePiece(board, color, move);
 		move = mv;
-		// console.log(square);
-		// console.log('sq');
 		botCurrentMove += 1;
-		// console.log(move);
-		// console.log('move');
 		return {
 			from: { ...square }, // starting position in chess notation
 			to: { sq: move, moveT: 'move' }, // target position in chess notation
-			piece: square
+			piece: square?.piece
 		};
 	}
 
