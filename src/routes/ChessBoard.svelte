@@ -180,7 +180,7 @@
 				moveHistory = [...moveHistory, moveItem];
 				// const moves = [...$state.snapshot(moveHistory)];
 				// console.log(moves);
-				// console.log('moves');
+				console.log('re calc moves');
 				// recalculate all moves for bot
 
 				calcMoves(board, moveHistory);
@@ -196,7 +196,7 @@
 					moveBot(bes);
 					// console.log('calcMoves before2');
 					// await tick();
-					calcMoves(board, [...$state.snapshot(moveHistory)]);
+					calcMoves(board, moveHistory);
 					// console.log('calcMoves after2');
 				}
 

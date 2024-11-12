@@ -148,23 +148,14 @@ export function kingMove(
 	// const validMoves = []
 	// console.log(ret);
 	if (newRow && newCol) {
-		// console.log(newPos);
-		// console.log('newPos');
+		console.log(newPos);
+		console.log('newPos');
 
 		// if ()
 
 		// const getMoves = castleMoves(board, currentPos, moveHistory);
 		// if (getMoves) validMoves = [...validMoves, ...getMoves];
 
-		const check = ret.some((el) => el[0] === newRow && el[1] === newCol);
-		// console.log(check);
-		// console.log('check');
-
-		if (check) {
-			console.log('found a castle move');
-
-			return 'castle';
-		}
 		if (newRow - currentRow > 1) {
 			console.log('row check');
 
@@ -184,6 +175,17 @@ export function kingMove(
 			console.log('col check');
 
 			return false;
+		}
+		const check = ret.some((el) => el[0] === newRow && el[1] === newCol);
+		const item = ret.filter((el) => el[0] === newRow && el[1] === newCol)[0];
+
+		// console.log(check);
+		// console.log('check');
+
+		if (check && item[2] === 'castle') {
+			console.log('found a castle move');
+
+			return 'castle';
 		}
 	}
 	return ret ?? true;

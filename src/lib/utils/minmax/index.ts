@@ -335,12 +335,17 @@ export function findBestMove(
 
 	if ([...moveHistory].length < 4) {
 		const moves = useOpeningMove();
+		// console.log(moves);
+		// console.log('moves');
 
 		let len = [...moveHistory].length - 1;
 		// console.log(len);
 		// console.log('len');
-		if (len === 2) len - 1;
 		let move = moves[len];
+
+		if (len === 2) move = moves[1];
+		// console.log(move);
+		// console.log('move');
 		if (move.length > 2) move = move[1] + move[2];
 		// console.log(move);
 		// console.log('move');
@@ -406,7 +411,7 @@ export function findBestMove(
 
 function useOpeningMove() {
 	// use a random open move
-	const move = getRandomInt(openingMoves.length) - 1;
+	const move = getRandomInt(openingMoves.length - 1);
 	return openingMoves[move];
 }
 
@@ -459,18 +464,23 @@ function getMirroredSquare(square: string): string {
 
 function getMovePiece(board: SquareOnBoard[], color: string, move: string) {
 	let letter = 'p';
-	// console.log(move);
-	// console.log('move');
+	console.log(move);
+	console.log('move');
 
 	if (move.length > 2) letter = move[0].toLocaleLowerCase();
 
 	// if (letter === 'n') letter = 'k';
 	// find piece name by first letter
 	// console.log(letter);
+	// console.log('letter');
 
 	let piece = getPieceByLetter(letter);
 	// console.log(piece);
+	// console.log('piece');
+
 	piece = `${color}-${piece}`;
+	// console.log(piece);
+	// console.log('piece');
 	//	const sq = square.piece?.replace(/^(white-|black-)/, '');
 	// 	let letter = '';
 	// 	letter = square.piece?.includes('knight') === true ? 'N' : sq.charAt(0).toUpperCase();
@@ -498,12 +508,11 @@ function getMovePiece(board: SquareOnBoard[], color: string, move: string) {
 		// console.log(move);
 		// console.log('move');
 		if (move?.potentialMoves) {
-			// console.log(potentialMoves);
-			// console.log('potentialMoves');
-			// console.log(rc);
-			// console.log('rc');
-
 			for (const potentialMoves of move.potentialMoves) {
+				// console.log(potentialMoves);
+				// console.log('potentialMoves');
+				// console.log(rc);
+				// console.log('rc');
 				if (potentialMoves[0] === rc[0] && potentialMoves[1] === rc[1]) {
 					square2 = move;
 				}
