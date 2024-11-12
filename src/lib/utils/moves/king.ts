@@ -147,6 +147,7 @@ export function kingMove(
 	if (newPos) [newRow, newCol] = newPos;
 	// const validMoves = []
 	// console.log(ret);
+	// let basic move check
 	if (newRow && newCol) {
 		console.log(newPos);
 		console.log('newPos');
@@ -156,36 +157,39 @@ export function kingMove(
 		// const getMoves = castleMoves(board, currentPos, moveHistory);
 		// if (getMoves) validMoves = [...validMoves, ...getMoves];
 
-		if (newRow - currentRow > 1) {
-			console.log('row check');
+		// if (newRow - currentRow > 1) {
+		// 	console.log('row check');
 
-			return false;
-		}
-		if (newCol - currentCol > 1) {
-			console.log('col check');
+		// 	return false;
+		// }
+		// if (newCol - currentCol > 1) {
+		// 	console.log('col check');
 
-			return false;
-		}
-		if (currentRow - newRow > 1) {
-			console.log('row check');
+		// 	return false;
+		// }
+		// if (currentRow - newRow > 1) {
+		// 	console.log('row check');
 
-			return false;
-		}
-		if (currentCol - newCol > 1) {
-			console.log('col check');
+		// 	return false;
+		// }
+		// if (currentCol - newCol > 1) {
+		// 	console.log('col check');
 
-			return false;
-		}
+		// 	return false;
+		// }
 		const check = ret.some((el) => el[0] === newRow && el[1] === newCol);
-		const item = ret.filter((el) => el[0] === newRow && el[1] === newCol)[0];
+		const item = ret.filter((el) => el[0] === newRow && el[1] === newCol);
 
+		// console.log(item);
+		// console.log('item');
 		// console.log(check);
 		// console.log('check');
-
-		if (check && item[2] === 'castle') {
+		const castler = item[0][2] ?? false;
+		if (check) {
 			console.log('found a castle move');
+			const ret = castler === 'castle' ? 'castle' : true;
 
-			return 'castle';
+			return ret;
 		}
 	}
 	return ret ?? true;

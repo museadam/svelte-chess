@@ -6,6 +6,11 @@
 	import { getRowAndColumn, getSquareFromRC } from '$lib/utils/moves';
 	import { calcMoves, validateMove } from '$lib/utils/moves/validate';
 	import { findBestMove } from '$src/lib/utils/minmax';
+	import {
+		getMirroredSquare,
+		getMovePiece,
+		useOpeningMove
+	} from '$src/lib/utils/bot/starter-moves';
 
 	interface Props {
 		board: SquareOnBoard[];
@@ -22,7 +27,8 @@
 
 	let currentPlayer = $state('white');
 	let nextPlayer = $state('black');
-
+	let botMoves: string[] = $state(setBotStarterMoves());
+	let botCurrentMove = $state(0);
 	// interface EventDetails {
 	// 	piece: SquareOnBoard;
 	// 	rowIndex: number;
@@ -160,9 +166,7 @@
 				}
 				board[rowIndex].piece = '';
 				board[rowIndex].potentialMoves = [];
-				// botBoard[row].piece = upgradePiece !== false ? upgradePiece : piece;
-				// botBoard[rowIndex].piece = '';
-				// botBoard[rowIndex].potentialMoves = [];
+
 				touch = false;
 				const moveItem: MoveHistory = {
 					to: square.square,
@@ -170,12 +174,6 @@
 					movedPiece: board[row].piece,
 					removedPiece
 				};
-				// console.log(moveItem);
-				// console.log('moveItem');
-				// console.log(moveHistory);
-				// console.log('moveHistory1');
-
-				// moveHistory.push(moveItem);
 
 				moveHistory = [...moveHistory, moveItem];
 				// const moves = [...$state.snapshot(moveHistory)];
@@ -188,11 +186,19 @@
 
 				if (selectedColor === 'white') {
 					currentPlayer = 'black';
-					// console.log('computer player');
-					// console.log([...$state.snapshot(board)]);
-					// console.log('board');
 
-					const bes = findBestMove([...$state.snapshot(board)], 2, 'black', moveHistory);
+					let bes;
+
+					let bmL = [...$state.snapshot(botMoves)].length;
+					// console.log(bmL);
+					// console.log(botCurrentMove);
+
+					if (bmL < botCurrentMove + 1) {
+						console.log('no more moves');
+						bes = findBestMove([...$state.snapshot(board)], 2, 'black', moveHistory);
+					} else {
+						bes = getBotStarterMoves('black');
+					}
 					moveBot(bes);
 					// console.log('calcMoves before2');
 					// await tick();
@@ -219,6 +225,28 @@
 	function handleDragOver(event: DragEvent & { currentTarget: EventTarget & HTMLDivElement }) {
 		event.preventDefault();
 		if (event?.dataTransfer) event.dataTransfer.dropEffect = 'drop';
+	}
+	function setBotStarterMoves() {
+		const moves = useOpeningMove();
+		// if (botMoves.length <= 0) botMoves = [...moves];
+		return moves;
+	}
+	function getBotStarterMoves(color: string) {
+		let move = botMoves[botCurrentMove];
+		// console.log(move);
+		// console.log('move');
+		const { square, mv } = getMovePiece(board, color, move);
+		move = mv;
+		// console.log(square);
+		// console.log('sq');
+		botCurrentMove += 1;
+		// console.log(move);
+		// console.log('move');
+		return {
+			from: { ...square }, // starting position in chess notation
+			to: { sq: move, moveT: 'move' }, // target position in chess notation
+			piece: square
+		};
 	}
 
 	function handleChessTouchingEnd(event: CustomEvent) {
