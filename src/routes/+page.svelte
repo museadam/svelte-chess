@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { slide } from 'svelte/transition';
+
 	import { onMount, tick } from 'svelte';
 	import ChessBoard from '$routes/ChessBoard.svelte';
 	import type { MoveHistory, SquareOnBoard } from '$types/board.ts';
@@ -60,8 +62,8 @@
 		await tick();
 		const squares = document.querySelectorAll('.chess-row');
 		// Loop through each square and add its position to the board object
-		console.log(squares);
-		console.log('squares');
+		// console.log(squares);
+		// console.log('squares');
 
 		squares.forEach((square) => {
 			// Get the position of the square relative to the screen
@@ -76,13 +78,13 @@
 			// Add the position to the board object
 			const coordinates = { x, y };
 			// convert str to num to stop type errors
-			console.log(coordinates);
-			console.log('coordinates');
+			// console.log(coordinates);
+			// console.log('coordinates');
 
 			if (row) board[+row] = { ...board[+row], coordinates };
 			if (row) startBoard[+row] = { ...startBoard[+row], coordinates };
-			console.log(row);
-			console.log('row');
+			// console.log(row);
+			// console.log('row');
 
 			// if (row) botBoard[+row] = { ...botBoard[+row], coordinates };
 		});
@@ -114,8 +116,8 @@
 	});
 </script>
 
-<div class="sheet">
-	{#if startGame}
+{#if startGame}
+	<div transition:slide class="sheet">
 		<button class="btn gradient-border" onclick={restartGame}> Restart </button>
 
 		<div class="gradient-border score-card">
@@ -139,8 +141,10 @@
 				</div>
 			</div>
 		</div>
-	{/if}
-	{#if !startGame}
+	</div>
+{/if}
+{#if !startGame}
+	<div transition:slide class="sheet">
 		<div
 			tabindex="0"
 			role="button"
@@ -172,8 +176,8 @@
 		>
 			<div class="player-name">Player vs CPU</div>
 		</div>
-	{/if}
-</div>
+	</div>
+{/if}
 
 <!-- <div>
 	{#if myKills > 0}

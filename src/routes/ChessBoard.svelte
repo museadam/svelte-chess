@@ -59,7 +59,7 @@
 		board[moveI].potentialMoves = [];
 	}
 
-	async function handleDrop(
+	function handleDrop(
 		event: string | (DragEvent & { currentTarget: EventTarget & HTMLDivElement }),
 		row: number,
 		square: SquareOnBoard
@@ -97,12 +97,12 @@
 		} else {
 			attackMove = true;
 		}
-		console.log(newPos);
-		console.log('newPos');
+		// console.log(newPos);
+		// console.log('newPos');
 
 		const isValidMove = validateMove(board, piece, currentPos, moveHistory, newPos);
-		console.log(isValidMove);
-		console.log('isValidMove');
+		// console.log(isValidMove);
+		// console.log('isValidMove');
 		if (currentPlayer === selectedColor) {
 			if (
 				isValidMove &&
@@ -186,13 +186,16 @@
 					let bmL = [...$state.snapshot(botMoves)].length;
 
 					if (bmL < botCurrentMove + 1) {
-						await tick();
-
-						bes = findBestMove([...$state.snapshot(board)], 2, 'black', moveHistory);
+						// await tick();
+						setTimeout(() => {
+							bes = findBestMove([...$state.snapshot(board)], 2, 'black', moveHistory);
+						}, 300);
 					} else {
 						bes = getBotStarterMoves('black');
 					}
-					moveBot(bes);
+					setTimeout(() => {
+						moveBot(bes);
+					}, 500);
 					calcMoves(board, moveHistory);
 				}
 

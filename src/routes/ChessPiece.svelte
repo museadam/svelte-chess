@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { SquareOnBoard, Coord } from '$types/board';
-	import { fly } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
 	// export let column;
 	import { createEventDispatcher } from 'svelte';
 	// import type { TouchEventHandler } from 'svelte/elements';
@@ -119,8 +119,8 @@
 		// console.log('rows');
 
 		const getLocation = findClosestCoordinates(currentLocation, board);
-		console.log(getLocation);
-		console.log('getLocation');
+		// console.log(getLocation);
+		// console.log('getLocation');
 		boardRowIndex = board.indexOf(getLocation);
 		// console.log(boardRowIndex);
 		// console.log('boardRowIndex');
@@ -179,22 +179,6 @@
 	// 	if (y2 - y1 > h) return false;
 	// 	return true;
 	// }
-	import { elasticOut } from 'svelte/easing';
-
-	/**
-	 * @param {HTMLElement} node
-	 * @param {{ delay?: number, duration?: number, easing?: (t: number) => number }} params
-	 */
-	function whoosh(node, params) {
-		const existingTransform = getComputedStyle(node).transform.replace('none', '');
-
-		return {
-			delay: params.delay || 100,
-			duration: params.duration || 1100,
-			easing: params.easing || elasticOut,
-			css: (t, u) => `transform: ${existingTransform} scale(${t})`
-		};
-	}
 </script>
 
 <div
@@ -205,7 +189,7 @@
 	ontouchstart={(e) => handleTouchStart(e)}
 	ontouchmove={(e) => handleTouchMove(e)}
 	ontouchend={handleTouchEnd}
-	in:whoosh
+	transition:slide
 >
 	{@render children?.()}
 </div>
