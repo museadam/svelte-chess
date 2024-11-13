@@ -7,7 +7,7 @@
 	import { calcMoves, validateMove } from '$lib/utils/moves/validate';
 	import { findBestMove } from '$src/lib/utils/minmax';
 	import { getMovePiece, useOpeningMove } from '$src/lib/utils/bot/starter-moves';
-	import Page from './+page.svelte';
+	// import Page from './+page.svelte';
 
 	interface Props {
 		board: SquareOnBoard[];
@@ -67,8 +67,8 @@
 		// Get the piece data from the data transfer object
 		// console.log(event?.dataTransfer);
 		// console.log('event.dataTransfer');
-		console.log(square);
-		console.log('square');
+		// console.log(square);
+		// console.log('square');
 
 		let attackMove = false;
 

@@ -69,6 +69,18 @@ function isUnderAttack(board: SquareOnBoard[], row: number, col: number, player:
 	}
 	return false;
 }
+function isPotentialDeath(board: SquareOnBoard[], newPos: number[], player: string): boolean {
+	for (const square of board) {
+		if (square.piece && !square.piece.includes(player) && square.potentialMoves) {
+			for (const move of square.potentialMoves) {
+				if (move[0] === newPos[0] && move[1] === newPos[1]) {
+					return true; // Square is under attack
+				}
+			}
+		}
+	}
+	return false;
+}
 
 function castleMoves(board: SquareOnBoard[], currentPos: number[], moveHistory: MoveHistory[]) {
 	const getPlayer = getSquareFromRC(currentPos);
@@ -142,7 +154,10 @@ export function kingMove(
 	const [currentRow, currentCol] = currentPos;
 	let ret;
 	ret = getKingMoves(board, currentPos, moveHistory);
-
+	const getPlayer = getSquareFromRC(currentPos);
+	const player = board.find((el) => el.square === getPlayer)?.piece.includes('white')
+		? 'white'
+		: 'black';
 	let newRow: number | undefined, newCol: number | undefined;
 	if (newPos) [newRow, newCol] = newPos;
 	// const validMoves = []
@@ -184,6 +199,10 @@ export function kingMove(
 		// console.log('item');
 		// console.log(check);
 		// console.log('check');
+		const safeMove = isPotentialDeath(board, newPos, player);
+		if (safeMove) {
+			return false;
+		}
 		if (check) {
 			const castler = item[0][2] ?? false;
 
