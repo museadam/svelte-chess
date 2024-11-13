@@ -67,6 +67,9 @@
 		// Get the piece data from the data transfer object
 		// console.log(event?.dataTransfer);
 		// console.log('event.dataTransfer');
+		console.log(square);
+		console.log('square');
+
 		let attackMove = false;
 
 		let piece, rowIndex, pieceSquare: string, pieceColor;
@@ -94,9 +97,12 @@
 		} else {
 			attackMove = true;
 		}
+		console.log(newPos);
+		console.log('newPos');
 
 		const isValidMove = validateMove(board, piece, currentPos, moveHistory, newPos);
-
+		console.log(isValidMove);
+		console.log('isValidMove');
 		if (currentPlayer === selectedColor) {
 			if (
 				isValidMove &&
@@ -154,10 +160,13 @@
 				} else {
 					board[row].piece = upgradePiece !== false ? upgradePiece : piece;
 				}
+
 				board[rowIndex].piece = '';
 				board[rowIndex].potentialMoves = [];
 
 				touch = false;
+				// await tick();
+
 				const moveItem: MoveHistory = {
 					to: square.square,
 					from: pieceSquare,
@@ -177,6 +186,8 @@
 					let bmL = [...$state.snapshot(botMoves)].length;
 
 					if (bmL < botCurrentMove + 1) {
+						await tick();
+
 						bes = findBestMove([...$state.snapshot(board)], 2, 'black', moveHistory);
 					} else {
 						bes = getBotStarterMoves('black');

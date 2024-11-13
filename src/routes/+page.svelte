@@ -12,7 +12,7 @@
 	// let botBoard: SquareOnBoard[] = $state(setBoard());
 	let moveHistory: MoveHistory[] = $state([]);
 
-	// $inspect(board);
+	$inspect(startBoard);
 	// $inspect(moveHistory);
 
 	let myKills = $state(0);
@@ -56,6 +56,38 @@
 			restartGame();
 		}
 	}
+	async function setBoardCoords() {
+		await tick();
+		const squares = document.querySelectorAll('.chess-row');
+		// Loop through each square and add its position to the board object
+		console.log(squares);
+		console.log('squares');
+
+		squares.forEach((square) => {
+			// Get the position of the square relative to the screen
+			const rect = square.getBoundingClientRect();
+			// Calculate the top-left corner of the square
+			const x = rect.left + window.pageXOffset;
+			const y = rect.top + window.pageYOffset;
+
+			// Get the row and column of the square
+			const row = square.ariaLabel;
+
+			// Add the position to the board object
+			const coordinates = { x, y };
+			// convert str to num to stop type errors
+			console.log(coordinates);
+			console.log('coordinates');
+
+			if (row) board[+row] = { ...board[+row], coordinates };
+			if (row) startBoard[+row] = { ...startBoard[+row], coordinates };
+			console.log(row);
+			console.log('row');
+
+			// if (row) botBoard[+row] = { ...botBoard[+row], coordinates };
+		});
+	}
+	$effect(() => {});
 
 	const displayed_count = $state(spring(0));
 	const their_displayed_count = $state(spring(0));
@@ -75,25 +107,7 @@
 	let offset2 = $derived(modulo($their_displayed_count, 1));
 
 	onMount(() => {
-		const squares = document.querySelectorAll('.chess-row');
-		// Loop through each square and add its position to the board object
-		squares.forEach((square) => {
-			// Get the position of the square relative to the screen
-			const rect = square.getBoundingClientRect();
-			// Calculate the top-left corner of the square
-			const x = rect.left + window.pageXOffset;
-			const y = rect.top + window.pageYOffset;
-
-			// Get the row and column of the square
-			const row = square.ariaLabel;
-
-			// Add the position to the board object
-			const coordinates = { x, y };
-			// convert str to num to stop type errors
-			if (row) board[+row] = { ...board[+row], coordinates };
-			if (row) startBoard[+row] = { ...startBoard[+row], coordinates };
-			// if (row) botBoard[+row] = { ...botBoard[+row], coordinates };
-		});
+		// setBoardCoords()
 		calcMoves(board, []);
 		// const bes = findBestMove(botBoard, 3, 'black');
 		// console.log(bes);
@@ -131,8 +145,9 @@
 			tabindex="0"
 			role="button"
 			class="gradient-border score-card startBtn"
-			onclick={() => {
+			onclick={async () => {
 				startGame = true;
+				await setBoardCoords();
 				cpu = false;
 			}}
 			onkeypress={(e) => {
@@ -146,8 +161,9 @@
 			tabindex="0"
 			role="button"
 			class="gradient-border score-card startBtn"
-			onclick={() => {
+			onclick={async () => {
 				startGame = true;
+				await setBoardCoords();
 				cpu = true;
 			}}
 			onkeypress={(e) => {

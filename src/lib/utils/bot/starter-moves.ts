@@ -9,19 +9,19 @@ export function useOpeningMove(): string[] {
 
 export function getMovePiece(board: SquareOnBoard[], color: string, move: string) {
 	let letter = 'p';
-	console.log(move);
-	console.log('move');
+	// console.log(move);
+	// console.log('move');
 	let mv = move;
 	if (move.length > 2) letter = move[0].toLocaleLowerCase();
-	console.log(letter);
-	console.log('letter');
+	// console.log(letter);
+	// console.log('letter');
 	let piece = getPieceByLetter(letter);
 	piece = `${color}-${piece}`;
 
 	if (letter !== 'p') mv = mv.substring(1);
 	if (color === 'black') mv = getMirroredSquare(mv);
-	console.log(mv);
-	console.log('mv');
+	// console.log(mv);
+	// console.log('mv');
 
 	const rc = getRowAndColumn(mv);
 

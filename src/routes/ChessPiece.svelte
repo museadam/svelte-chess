@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { SquareOnBoard, Coord } from '$types/board';
-
+	import { fly } from 'svelte/transition';
 	// export let column;
 	import { createEventDispatcher } from 'svelte';
 	// import type { TouchEventHandler } from 'svelte/elements';
@@ -51,6 +51,9 @@
 
 	function findClosestCoordinates(coords: Coord, arr: SquareOnBoard[]) {
 		const distances = arr.map((c) => {
+			// console.log(coords);
+			// console.log(c);
+
 			return {
 				coordinates: c,
 				distance: distance(coords.x, coords.y, c?.coordinates?.x ?? 0, c?.coordinates?.y ?? 0)
@@ -71,6 +74,8 @@
 
 	// this offsets the piece to more easily see when touched
 	function handleTouchStart(e) {
+		console.log('hand touch start');
+
 		status = 'Touch start with element ' + e.target.getAttribute('id');
 		originalX = e.target.offsetLeft - 10 + 'px';
 		originalY = e.target.offsetTop - 10 + 'px';
@@ -80,13 +85,20 @@
 	// this is determining the new location
 	function handleTouchMove(e) {
 		// console.log(e);
-		console.log('hand touch move');
+		// console.log('hand touch move');
+		// console.log(status);
+		// console.log('status');
 
 		let touchLocation = e.targetTouches[0];
 		// console.log(touchLocation);
 		let pageX = Math.floor(touchLocation.pageX - 20) + 'px';
 		let pageY = Math.floor(touchLocation.pageY - 60) + 'px';
+		// console.log(pageX);
+		// console.log(pageY);
+
+		// console.log('pageY');
 		status = 'Touch x ' + pageX + ' Touch y ' + pageY;
+
 		// console.log(status);
 		e.target.style.position = 'absolute';
 		e.target.style.left = pageX;
@@ -101,8 +113,17 @@
 		};
 		activeEvent = 'move';
 		const rows = board;
-		const getLocation = findClosestCoordinates(currentLocation, rows);
+		// console.log(currentLocation);
+		// console.log('currentLocation');
+		// console.log(rows);
+		// console.log('rows');
+
+		const getLocation = findClosestCoordinates(currentLocation, board);
+		console.log(getLocation);
+		console.log('getLocation');
 		boardRowIndex = board.indexOf(getLocation);
+		// console.log(boardRowIndex);
+		// console.log('boardRowIndex');
 		newRowIndex = boardRowIndex;
 	}
 
@@ -113,9 +134,16 @@
 		console.log('hand touch end');
 
 		if (activeEvent === 'move') {
+			// console.log(square);
+			// console.log('square');
+			// console.log(boardRowIndex);
+			// console.log('boardRowIndex');
 			const oldLocation = `${square.piece},${rowIndex},${square.square},${square.color}`;
 			const newLocation = boardRowIndex;
 			const item = { oldLocation, newLocation };
+			// console.log(item);
+			// console.log('item');
+
 			dispatch('touchingend', { item });
 			e.target.style.left = originalX;
 			e.target.style.top = originalY;
@@ -151,6 +179,22 @@
 	// 	if (y2 - y1 > h) return false;
 	// 	return true;
 	// }
+	import { elasticOut } from 'svelte/easing';
+
+	/**
+	 * @param {HTMLElement} node
+	 * @param {{ delay?: number, duration?: number, easing?: (t: number) => number }} params
+	 */
+	function whoosh(node, params) {
+		const existingTransform = getComputedStyle(node).transform.replace('none', '');
+
+		return {
+			delay: params.delay || 100,
+			duration: params.duration || 1100,
+			easing: params.easing || elasticOut,
+			css: (t, u) => `transform: ${existingTransform} scale(${t})`
+		};
+	}
 </script>
 
 <div
@@ -158,9 +202,10 @@
 	class="chess-piece"
 	draggable={drag}
 	ondragstart={handleDragStart}
-	ontouchstart={handleTouchStart}
-	ontouchmove={handleTouchMove}
+	ontouchstart={(e) => handleTouchStart(e)}
+	ontouchmove={(e) => handleTouchMove(e)}
 	ontouchend={handleTouchEnd}
+	in:whoosh
 >
 	{@render children?.()}
 </div>

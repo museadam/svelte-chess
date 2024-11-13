@@ -43,70 +43,28 @@ function minimax(
 	}
 }
 
-//  version 2
-// function minimax(
-// 	board: SquareOnBoard[],
-// 	depth: number,
-// 	isMaximizingPlayer: boolean,
-// 	color: 'white' | 'black'
-// ): number {
-// 	// Base case: Evaluate the board at max depth or if the game is over
-// 	if (depth === 0 || isGameOver(board)) {
-// 		return evaluateBoard(board);
-// 	}
-
-// 	let bestValue = isMaximizingPlayer ? -Infinity : Infinity;
-
-// 	for (const square of board) {
-// 		// Check if the square has the current player's piece and moves
-// 		if (square.piece?.startsWith(color) && square.potentialMoves) {
-// 			for (const move of square.potentialMoves) {
-// 				const newBoard = makeMove(board, square, move);
-
-// 				// Check if moving here would be threatened by opponent moves
-// 				if (!isMoveSafe(newBoard, move, isMaximizingPlayer ? 'black' : 'white')) {
-// 					continue; // Skip moves that are immediately threatened
-// 				}
-
-// 				// Run minimax recursively for the next depth and opponent
-// 				const evalValue = minimax(
-// 					newBoard,
-// 					depth - 1,
-// 					!isMaximizingPlayer,
-// 					isMaximizingPlayer ? 'black' : 'white'
-// 				);
-
-// 				if (isMaximizingPlayer) {
-// 					bestValue = Math.max(bestValue, evalValue);
-// 				} else {
-// 					bestValue = Math.min(bestValue, evalValue);
-// 				}
-// 			}
-// 		}
-// 	}
-
 // 	return bestValue;
 // }
 
 // Helper function to check if a move is safe from immediate threats by the opponent
-function isMoveSafe(
-	board: SquareOnBoard[],
-	move: ValidMove,
-	opponentColor: 'white' | 'black'
-): boolean {
-	// Check if any of the opponent's pieces can reach the position in `move`
-	for (const square of board) {
-		if (square.piece?.startsWith(opponentColor) && square.potentialMoves) {
-			for (const opponentMove of square.potentialMoves) {
-				if (opponentMove[0] === move[0] && opponentMove[1] === move[1]) {
-					// Found an opponent move to this position, meaning it's unsafe
-					return false;
-				}
-			}
-		}
-	}
-	return true;
-}
+// function isMoveSafe(
+// 	board: SquareOnBoard[],
+// 	move: ValidMove,
+// 	opponentColor: 'white' | 'black'
+// ): boolean {
+// 	// Check if any of the opponent's pieces can reach the position in `move`
+// 	for (const square of board) {
+// 		if (square.piece?.startsWith(opponentColor) && square.potentialMoves) {
+// 			for (const opponentMove of square.potentialMoves) {
+// 				if (opponentMove[0] === move[0] && opponentMove[1] === move[1]) {
+// 					// Found an opponent move to this position, meaning it's unsafe
+// 					return false;
+// 				}
+// 			}
+// 		}
+// 	}
+// 	return true;
+// }
 
 function makeMove(
 	board: SquareOnBoard[],
@@ -125,6 +83,7 @@ function makeMove(
 		oldSquare.piece = ''; // Clear original square
 		oldSquare.potentialMoves = undefined; // Clear original square
 		calcMoves(newBoard, moveHistory);
+		// console.log(newBoard);
 	}
 	return newBoard;
 }
@@ -174,8 +133,8 @@ function isGameOver(board: SquareOnBoard[]): boolean {
 type Move = {
 	// move: string;
 	// moveT: string;
-	from: string;
-	to: string;
+	from: SquareOnBoard;
+	to: { sq: string; moveT: string };
 	piece: string;
 };
 
@@ -222,11 +181,13 @@ export function findBestMove(
 					// 	move: square.square,
 					// 	moveT: move[2]
 					// };
-					bestMove = {
-						from: { ...square }, // starting position in chess notation
-						to: { sq: getSquareFromRC([move[0], move[1]]), moveT: move[2] }, // target position in chess notation
-						piece: square.piece
-					};
+					if (move) {
+						bestMove = {
+							from: { ...square }, // starting position in chess notation
+							to: { sq: getSquareFromRC([move[0], move[1]]), moveT: move[2] }, // target position in chess notation
+							piece: square.piece
+						};
+					}
 				}
 			}
 		}
