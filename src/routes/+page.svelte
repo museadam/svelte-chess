@@ -24,6 +24,8 @@
 	let theirKillsArr = $state([]);
 	let startGame = $state(false);
 	let cpu = $state(false);
+	let botVsBot = $state(false);
+	let gameOver = $state(false);
 
 	function restartGame() {
 		myKills = 0;
@@ -51,10 +53,13 @@
 		if (event.detail.kill === 'black-king') {
 			alert('YOU WIN!');
 			await tick();
+			gameOver = true;
+
 			restartGame();
 		} else if (event.detail.kill === 'white-king') {
 			alert('YOU LOSE!');
 			await tick();
+			gameOver = true;
 			restartGame();
 		}
 	}
@@ -130,7 +135,18 @@
 				</div>
 			</div>
 		</div>
-		<ChessBoard bind:board bind:moveHistory {cpu} on:kills={(e) => handleKill(e)} />
+		<ChessBoard
+			bind:board
+			bind:moveHistory
+			{cpu}
+			{botVsBot}
+			{gameOver}
+			on:kills={(e) => handleKill(e)}
+		/>
+		<!-- bind:myKills
+		bind:myKillsArr
+		bind:theirKills
+		bind:theirKillsArr -->
 
 		<div class="gradient-border score-card">
 			<div class="player-name">White Player</div>
@@ -175,6 +191,21 @@
 			}}
 		>
 			<div class="player-name">Player vs CPU</div>
+		</div>
+		<div
+			tabindex="0"
+			role="button"
+			class="gradient-border score-card startBtn"
+			onclick={async () => {
+				startGame = true;
+				await setBoardCoords();
+				botVsBot = true;
+			}}
+			onkeypress={(e) => {
+				if (e.key === 'Shift+c') startGame = true;
+			}}
+		>
+			<div class="player-name">CPU vs CPU</div>
 		</div>
 	</div>
 {/if}

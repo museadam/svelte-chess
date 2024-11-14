@@ -79,3 +79,16 @@ export function calcMoves(board: SquareOnBoard[], moveHistory: MoveHistory[]) {
 	}
 	return board;
 }
+export function calcMove(
+	board: SquareOnBoard[],
+	currentSquare: SquareOnBoard,
+	moveHistory: MoveHistory[]
+) {
+	if (currentSquare.piece !== '') {
+		// console.log('getting mvoes for ' + board[i].piece);
+		const currentPos = getRowAndColumn(currentSquare.square);
+		const currentPiece = currentSquare.piece;
+		return validateMove(board, currentPiece, currentPos, moveHistory) as ValidMove[] | undefined;
+	}
+	// return board;
+}

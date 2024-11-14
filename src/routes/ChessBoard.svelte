@@ -13,11 +13,27 @@
 		board: SquareOnBoard[];
 		moveHistory: MoveHistory[];
 		cpu: boolean;
+		botVsBot: boolean;
+		gameOver: boolean;
+		// myKills: number;
+		// myKillsArr: string[];
+		// theirKills: number;
+		// theirIKillsArr: string[];
 	}
 
-	let { board = $bindable(), moveHistory = $bindable(), cpu }: Props = $props();
+	let {
+		board = $bindable(),
+		moveHistory = $bindable(),
+		cpu,
+		botVsBot,
+		gameOver = false
+		// myKills = $bindable(),
+		// myKillsArr = $bindable(),
+		// theirKills = $bindable(),
+		// theirIKillsArr = $bindable()
+	}: Props = $props();
+	let watchGame = $derived(gameOver);
 	let newRowIndex: string = $state('');
-	// $inspect(botBoard);
 
 	let newLocation: number | undefined = $state(); // index
 	let oldLocation = $state('');
@@ -27,6 +43,23 @@
 	let nextPlayer = $state('black');
 	let botMoves: string[] = $state(setBotStarterMoves());
 	let botCurrentMove = $state(0);
+	$inspect(botMoves);
+	$inspect(botCurrentMove);
+
+	$effect(() => {
+		botVsBot;
+		setTimeout(() => {
+			vsBots();
+		}, 2000);
+	});
+
+	// $effect(() => {
+	// 	runAgain;
+	// 	return () => {
+	// 		vsBots();
+	// 	};
+	// });
+
 	// interface EventDetails {
 	// 	piece: SquareOnBoard;
 	// 	rowIndex: number;
@@ -38,11 +71,14 @@
 		const newI = board.findIndex((element) => element.square === move?.to.sq);
 
 		let removedPiece;
-
+		// console.log(move);
 		if (move?.to.moveT === 'attack') {
 			const kill = board[newI].piece;
 			removedPiece = kill;
 			const killBy = currentPlayer;
+			// console.log(killBy);
+			// console.log('killBy');
+
 			dispatch('kills', { kill, killBy });
 		}
 		const moveItem: MoveHistory = {
@@ -59,7 +95,7 @@
 		board[moveI].potentialMoves = [];
 	}
 
-	function handleDrop(
+	async function handleDrop(
 		event: string | (DragEvent & { currentTarget: EventTarget & HTMLDivElement }),
 		row: number,
 		square: SquareOnBoard
@@ -165,7 +201,7 @@
 				board[rowIndex].potentialMoves = [];
 
 				touch = false;
-				// await tick();
+				await tick();
 
 				const moveItem: MoveHistory = {
 					to: square.square,
@@ -186,16 +222,19 @@
 					let bmL = [...$state.snapshot(botMoves)].length;
 
 					if (bmL < botCurrentMove + 1) {
-						// await tick();
-						setTimeout(() => {
-							bes = findBestMove([...$state.snapshot(board)], 2, 'black', moveHistory);
-						}, 300);
+						await tick();
+
+						// setTimeout(() => {
+						bes = findBestMove([...$state.snapshot(board)], 2, 'black', moveHistory);
+
+						// }, 300);
 					} else {
 						bes = getBotStarterMoves('black');
 					}
-					setTimeout(() => {
-						moveBot(bes);
-					}, 500);
+					// setTimeout(() => {
+
+					moveBot(bes);
+					// }, 500);
 					calcMoves(board, moveHistory);
 				}
 
@@ -213,6 +252,39 @@
 			console.log('Its not your turn');
 		}
 		touch = false;
+	}
+	async function vsBots() {
+		// await tick();
+
+		let bes;
+
+		let bmL = [...$state.snapshot(botMoves)].length;
+		let num = 6;
+		if (bmL === 2) num = 4;
+		if ([...$state.snapshot(moveHistory)].length >= num) {
+			// setTimeout(() => {
+			bes = findBestMove([...$state.snapshot(board)], 2, currentPlayer, moveHistory);
+
+			// }, 300);
+		} else {
+			bes = getBotStarterMoves(currentPlayer);
+		}
+		// console.log(bes);
+		// console.log('bes');
+		moveBot(bes);
+		calcMoves(board, moveHistory);
+		// await tick();
+
+		if (currentPlayer === 'white' && [...$state.snapshot(moveHistory)].length <= num)
+			botCurrentMove -= 1;
+
+		currentPlayer = currentPlayer === 'black' ? 'white' : 'black';
+		setTimeout(() => {
+			recursive();
+		}, 2500);
+	}
+	function recursive() {
+		if (!watchGame) vsBots();
 	}
 
 	function handleDragOver(event: DragEvent & { currentTarget: EventTarget & HTMLDivElement }) {
@@ -263,7 +335,7 @@
 			<div
 				role="figure"
 				class="square {square.color}"
-				ondrop={(event) => handleDrop(event, rowIndex, square)}
+				ondrop={async (event) => await handleDrop(event, rowIndex, square)}
 				ondragover={(event) => handleDragOver(event)}
 			>
 				<!-- <p class="squareLabel top-0">{square.square}</p> -->
@@ -327,7 +399,6 @@
 		grid-gap: 0;
 	}
 	.chess-piece {
-		position: absolute;
 		width: 40px;
 		height: 40px;
 		user-select: none;
@@ -342,9 +413,9 @@
 	.chess-piece:active {
 		opacity: 0.5;
 	}
-	.chess-row {
-		/* position: relative; */
-	}
+	/* .chess-row {
+		position: relative;
+	} */
 	.square {
 		width: 40px;
 		height: 40px;

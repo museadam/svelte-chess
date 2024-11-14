@@ -201,6 +201,7 @@
 	.chess-piece:active {
 		cursor: grabbing;
 	}
+
 	/* .chess-piece:-moz-drag-over {
 		cursor: grabbing;
 	} */

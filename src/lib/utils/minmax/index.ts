@@ -1,6 +1,6 @@
 import type { MoveHistory, SquareOnBoard, ValidMove } from '$types/board';
 import { getSquareFromRC, getRowAndColumn } from '../moves';
-import { calcMoves } from '../moves/validate';
+import { calcMoves, calcMove } from '../moves/validate';
 
 //  version 1
 
@@ -83,7 +83,7 @@ function makeMove(
 		oldSquare.piece = ''; // Clear original square
 		oldSquare.potentialMoves = undefined; // Clear original square
 		calcMoves(newBoard, moveHistory);
-		// console.log(newBoard);
+		// console.log(square.piece);
 	}
 	return newBoard;
 }
