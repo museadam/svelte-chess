@@ -102,11 +102,11 @@ function evaluateBoard(board: SquareOnBoard[]): number {
 
 function getPieceValue(piece: string): number {
 	const weights: { [key: string]: number } = {
-		pawn: 1,
-		knight: 3,
-		bishop: 3,
+		pawn: 3,
+		knight: 4,
+		bishop: 4,
 		rook: 5,
-		queen: 9,
+		queen: 11,
 		king: 1000
 	};
 	return weights[piece.split('-')[1]] || 0;
@@ -137,7 +137,14 @@ type Move = {
 	to: { sq: string; moveT: string };
 	piece: string;
 };
-
+const shuffleArray = (board: SquareOnBoard[]) => {
+	for (let i = board.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		const temp = board[i];
+		board[i] = board[j];
+		board[j] = temp;
+	}
+};
 export function findBestMove(
 	b: SquareOnBoard[],
 	depth: number,
@@ -146,12 +153,15 @@ export function findBestMove(
 ): Move | null {
 	let bestMove: Move | null = null;
 	let bestValue = color === 'white' ? -Infinity : Infinity;
-	const board = [...b];
+	let board = [...b];
+	let boardStatic = [...b];
+
+	shuffleArray(board);
 
 	for (const square of board) {
 		if (square.piece?.startsWith(color) && square?.potentialMoves) {
 			for (const move of square.potentialMoves) {
-				const newBoard = makeMove(board, square, move, moveHistory);
+				const newBoard = makeMove(boardStatic, square, move, moveHistory);
 
 				const boardValue = minimax(newBoard, depth - 1, color === 'black', moveHistory);
 
@@ -160,6 +170,8 @@ export function findBestMove(
 					(color === 'white' && boardValue > bestValue) ||
 					(color === 'black' && boardValue < bestValue)
 				) {
+					console.log(boardValue);
+					console.log('boardValue');
 					// console.log(move);
 					// console.log('move');
 

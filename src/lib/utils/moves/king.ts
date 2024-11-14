@@ -70,7 +70,7 @@ function isUnderAttack(board: SquareOnBoard[], row: number, col: number, player:
 	}
 	return false;
 }
-function createMovesAfter(
+export function createMovesAfter(
 	board: SquareOnBoard[],
 	move: ValidMove[],
 	oldLocation: SquareOnBoard,
@@ -91,7 +91,11 @@ function createMovesAfter(
 	return isPotentialDeath(newBoard, move, player);
 }
 
-function isPotentialDeath(board: SquareOnBoard[], newPos: number[], player: string): boolean {
+export function isPotentialDeath(
+	board: SquareOnBoard[],
+	newPos: number[],
+	player: string
+): boolean {
 	let ret = false;
 	for (const square of board) {
 		if (square.piece && !square.piece.includes(player) && square.potentialMoves) {

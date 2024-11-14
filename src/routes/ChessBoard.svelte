@@ -42,15 +42,17 @@
 	let currentPlayer = $state('white');
 	let nextPlayer = $state('black');
 	let botMoves: string[] = $state(setBotStarterMoves());
+	let botMoves2: string[] = $state(setBotStarterMoves());
+
 	let botCurrentMove = $state(0);
-	$inspect(botMoves);
-	$inspect(botCurrentMove);
+	// $inspect(botMoves);
+	// $inspect(botCurrentMove);
 
 	$effect(() => {
-		botVsBot;
-		setTimeout(() => {
-			vsBots();
-		}, 2000);
+		if (botVsBot)
+			setTimeout(() => {
+				vsBots();
+			}, 1000);
 	});
 
 	// $effect(() => {
@@ -229,7 +231,7 @@
 
 						// }, 300);
 					} else {
-						bes = getBotStarterMoves('black');
+						bes = getBotStarterMoves('black', botMoves);
 					}
 					// setTimeout(() => {
 
@@ -257,8 +259,9 @@
 		// await tick();
 
 		let bes;
+		const moves = currentPlayer === 'white' ? botMoves2 : botMoves;
 
-		let bmL = [...$state.snapshot(botMoves)].length;
+		let bmL = [...$state.snapshot(moves)].length;
 		let num = 6;
 		if (bmL === 2) num = 4;
 		if ([...$state.snapshot(moveHistory)].length >= num) {
@@ -267,7 +270,7 @@
 
 			// }, 300);
 		} else {
-			bes = getBotStarterMoves(currentPlayer);
+			bes = getBotStarterMoves(currentPlayer, moves);
 		}
 		// console.log(bes);
 		// console.log('bes');
@@ -295,8 +298,8 @@
 		const moves = useOpeningMove();
 		return moves;
 	}
-	function getBotStarterMoves(color: string) {
-		let move = botMoves[botCurrentMove];
+	function getBotStarterMoves(color: string, moves: string[]) {
+		let move = moves[botCurrentMove];
 		const { square, mv } = getMovePiece(board, color, move);
 		move = mv;
 		botCurrentMove += 1;
