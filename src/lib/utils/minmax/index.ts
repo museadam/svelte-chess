@@ -1,4 +1,4 @@
-import type { MoveHistory, SquareOnBoard, ValidMove } from '$types/board';
+import type { BotMove, MoveHistory, SquareOnBoard, ValidMove } from '$types/board';
 import { getSquareFromRC, getRowAndColumn } from '../moves';
 import { calcMoves, calcMove } from '../moves/validate';
 
@@ -130,13 +130,6 @@ function isGameOver(board: SquareOnBoard[]): boolean {
 // 	return `${files[col]}${8 - row}`;
 // }
 
-type Move = {
-	// move: string;
-	// moveT: string;
-	from: SquareOnBoard;
-	to: { sq: string; moveT: string };
-	piece: string;
-};
 const shuffleArray = (board: SquareOnBoard[]) => {
 	for (let i = board.length - 1; i > 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1));
@@ -150,8 +143,8 @@ export function findBestMove(
 	depth: number,
 	color: 'white' | 'black',
 	moveHistory: MoveHistory[]
-): Move | null {
-	let bestMove: Move | null = null;
+): BotMove | null {
+	let bestMove: BotMove | null = null;
 	let bestValue = color === 'white' ? -Infinity : Infinity;
 	let board = [...b];
 	let boardStatic = [...b];
@@ -170,8 +163,8 @@ export function findBestMove(
 					(color === 'white' && boardValue > bestValue) ||
 					(color === 'black' && boardValue < bestValue)
 				) {
-					console.log(boardValue);
-					console.log('boardValue');
+					// console.log(boardValue);
+					// console.log('boardValue');
 					// console.log(move);
 					// console.log('move');
 

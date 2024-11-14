@@ -65,6 +65,9 @@ export function getSquareFromRC(square: number[]) {
 	const rank = 8 - row; // Convert row to rank number (1-8)
 	return `${file}${rank}`;
 }
+export function getSquareDetails(square: string, board: SquareOnBoard[]) {
+	return board.filter((el) => el.square === square)[0];
+}
 
 function setAllMoves() {
 	const allMoves = [];
@@ -81,7 +84,7 @@ export function calculateValidMove(
 	board: SquareOnBoard[],
 	oldPosition: number[],
 	newPosition: number[]
-): ValidMove {
+): ValidMove | undefined {
 	const getPlayer = getSquareFromRC(oldPosition);
 	const player =
 		board.filter((el) => el.square === getPlayer)[0].piece.includes('white') === true

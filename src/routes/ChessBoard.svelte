@@ -7,6 +7,7 @@
 	import { calcMoves, validateMove } from '$lib/utils/moves/validate';
 	import { findBestMove } from '$src/lib/utils/minmax';
 	import { getMovePiece, useOpeningMove } from '$src/lib/utils/bot/starter-moves';
+	import { getCastlePositions } from '$src/lib/utils/moves/king';
 	// import Page from './+page.svelte';
 
 	interface Props {
@@ -112,7 +113,7 @@
 
 		let piece, rowIndex, pieceSquare: string, pieceColor;
 		if (!touch) {
-			event.preventDefault();
+			if (typeof event !== 'string') event.preventDefault();
 
 			[piece, rowIndex, pieceSquare, pieceColor] = event.dataTransfer
 				.getData('text/plain')
@@ -155,41 +156,14 @@
 					dispatch('kills', { kill, killBy });
 				}
 				const strValidMov = isValidMove.toString();
-				let upgradePiece: boolean | ValidMove[] = false;
+				let upgradePiece: boolean | ValidMove[] | string = false;
 				upgradePiece = strValidMov?.includes('queen') === true ? isValidMove : false;
 
 				let castleIt: boolean | ValidMove[] = false;
 
 				if (isValidMove) castleIt = strValidMov?.includes('castle') === true ? true : false;
 				if (castleIt) {
-					let rookSq;
-					let kingSq;
-					switch (square.square) {
-						case 'h1':
-							rookSq = [newPos[0], newPos[1] - 2];
-							kingSq = [newPos[0], newPos[1] - 1];
-							break;
-						case 'a1':
-							rookSq = [newPos[0], newPos[1] + 2];
-							kingSq = [newPos[0], newPos[1] + 1];
-							break;
-						case 'a8':
-							rookSq = [newPos[0], newPos[1] + 2];
-							kingSq = [newPos[0], newPos[1] + 1];
-							break;
-						case 'h8':
-							rookSq = [newPos[0], newPos[1] - 2];
-							kingSq = [newPos[0], newPos[1] - 1];
-							break;
-						default:
-							break;
-					}
-
-					const newKingSq = getSquareFromRC(kingSq);
-					const newRookSq = getSquareFromRC(rookSq);
-
-					const indexKing = board.findIndex((element) => element.square === newKingSq);
-					const indexRook = board.findIndex((element) => element.square === newRookSq);
+					let { indexKing, indexRook } = getCastlePositions(square.square, newPos, board);
 
 					board[row].piece = '';
 					board[row].potentialMoves = [];
@@ -201,8 +175,8 @@
 
 				board[rowIndex].piece = '';
 				board[rowIndex].potentialMoves = [];
-
 				touch = false;
+
 				await tick();
 
 				const moveItem: MoveHistory = {
@@ -215,6 +189,7 @@
 				moveHistory = [...moveHistory, moveItem];
 
 				calcMoves(board, moveHistory);
+				// setTimeout(() => {}, 1000);
 
 				if (selectedColor === 'white' && cpu) {
 					currentPlayer = 'black';
@@ -255,6 +230,7 @@
 		}
 		touch = false;
 	}
+
 	async function vsBots() {
 		// await tick();
 

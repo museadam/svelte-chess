@@ -14,8 +14,18 @@ export type Coord = {
 
 export type Colors = 'dark' | 'light';
 
+// ValidMove is for potential moves
 // [x, y, moveType, weight(strength of move)]
 export type ValidMove = [number, number, 'move' | 'attack' | 'castle' | 'promotion', number];
+
+// for bots
+export type BotMove = {
+	// move: string;
+	// moveT: string;
+	from: SquareOnBoard;
+	to: { sq: string; moveT: string };
+	piece: string;
+};
 
 export type MoveHistory = {
 	to: string; // to square

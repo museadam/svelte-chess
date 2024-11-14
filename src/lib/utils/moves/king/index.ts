@@ -1,6 +1,6 @@
 import type { SquareOnBoard, ValidMove, MoveHistory } from '$types/board';
-import { getRowAndColumn, getSquareFromRC } from '.';
-import { calcMoves } from './validate';
+import { getRowAndColumn, getSquareDetails, getSquareFromRC } from '..';
+import { calcMoves } from '../validate';
 
 export function getKingMoves(
 	board: SquareOnBoard[],
@@ -72,7 +72,7 @@ function isUnderAttack(board: SquareOnBoard[], row: number, col: number, player:
 }
 export function createMovesAfter(
 	board: SquareOnBoard[],
-	move: ValidMove[],
+	move: number[],
 	oldLocation: SquareOnBoard,
 	moveHistory: MoveHistory[],
 	player: string
@@ -93,7 +93,7 @@ export function createMovesAfter(
 
 export function isPotentialDeath(
 	board: SquareOnBoard[],
-	newPos: number[],
+	newPos: number[] | ValidMove[],
 	player: string
 ): boolean {
 	let ret = false;
@@ -106,14 +106,14 @@ export function isPotentialDeath(
 				if (pawnAttack[1][0] === newPos[0] && pawnAttack[1][1] === newPos[1]) ret = true;
 			}
 			for (const move of square.potentialMoves) {
-				if (square.piece.includes('knight')) {
-					console.log('knight moves: ');
+				// if (square.piece.includes('knight')) {
+				// 	console.log('knight moves: ');
 
-					console.log(move);
-					console.log('move');
-					console.log(newPos);
-					console.log('newPos');
-				}
+				// 	console.log(move);
+				// 	console.log('move');
+				// 	console.log(newPos);
+				// 	console.log('newPos');
+				// }
 
 				// console.log(square);
 
@@ -121,7 +121,7 @@ export function isPotentialDeath(
 					if (square.piece.includes('pawn')) {
 						if (move[2] !== 'attack') {
 							ret = false;
-							console.log('pawwn retter');
+							// console.log('pawwn retter');
 						} else ret = true;
 					} else {
 						ret = true;
@@ -150,7 +150,11 @@ function checkPotentialPawnAttacks(player: string, move: ValidMove | number[]) {
 	return [retL, retR];
 }
 
-function castleMoves(board: SquareOnBoard[], currentPos: number[], moveHistory: MoveHistory[]) {
+function castleMoves(
+	board: SquareOnBoard[],
+	currentPos: number[],
+	moveHistory: MoveHistory[]
+): ValidMove[] | undefined {
 	const getPlayer = getSquareFromRC(currentPos);
 	const player = board.find((el) => el.square === getPlayer)?.piece.includes('white')
 		? 'white'
@@ -164,10 +168,13 @@ function castleMoves(board: SquareOnBoard[], currentPos: number[], moveHistory: 
 		leftRook = 'h8';
 		rightRook = 'a8';
 	}
-	let validMoves;
-	let hasKingMoved: boolean = moveHistory.find((el) => el.movedPiece === king) ?? false;
-	let hasLeftRookMoved: boolean = moveHistory.find((el) => el.from === leftRook) ?? false;
-	let hasRightRookMoved: boolean = moveHistory.find((el) => el.from === rightRook) ?? false;
+	let validMoves: ValidMove[] | undefined;
+	let hasKingMoved: boolean | MoveHistory =
+		moveHistory.find((el) => el.movedPiece === king) ?? false;
+	let hasLeftRookMoved: boolean | MoveHistory =
+		moveHistory.find((el) => el.from === leftRook) ?? false;
+	let hasRightRookMoved: boolean | MoveHistory =
+		moveHistory.find((el) => el.from === rightRook) ?? false;
 	if (!hasKingMoved) {
 		validMoves = [];
 		// King-side castling (right)
@@ -231,7 +238,7 @@ export function kingMove(
 	// const validMoves = []
 	// console.log(ret);
 	// let basic move check
-	if (newRow && newCol) {
+	if (newRow && newCol && newPos) {
 		// console.log(newPos);
 		// console.log('newPos');
 
@@ -271,13 +278,17 @@ export function kingMove(
 		// console.log('newPos');
 		const safeMove = isPotentialDeath(board, newPos, player);
 		let safeMoveAfter = false;
-		if (!safeMove) {
-			safeMoveAfter = createMovesAfter(board, newPos, getPlayer, moveHistory, player);
+		if (!safeMove && newPos) {
+			// console.log(getPlayer);
+
+			const getSquare = getSquareDetails(getPlayer, board);
+			// console.log(getSquare);
+			safeMoveAfter = createMovesAfter(board, newPos, getSquare, moveHistory, player);
 		}
-		console.log(safeMove);
-		console.log('safeMove');
-		console.log(safeMoveAfter);
-		console.log('safeMoveAfter');
+		// console.log(safeMove);
+		// console.log('safeMove');
+		// console.log(safeMoveAfter);
+		// console.log('safeMoveAfter');
 		if (safeMove || safeMoveAfter) {
 			return false;
 		}
@@ -291,4 +302,37 @@ export function kingMove(
 		}
 	}
 	return false;
+}
+
+export function getCastlePositions(square: string, newPos: number[], board: SquareOnBoard[]) {
+	let rookSq;
+	let kingSq;
+	switch (square) {
+		case 'h1':
+			rookSq = [newPos[0], newPos[1] - 2];
+			kingSq = [newPos[0], newPos[1] - 1];
+			break;
+		case 'a1':
+			rookSq = [newPos[0], newPos[1] + 2];
+			kingSq = [newPos[0], newPos[1] + 1];
+			break;
+		case 'a8':
+			rookSq = [newPos[0], newPos[1] + 2];
+			kingSq = [newPos[0], newPos[1] + 1];
+			break;
+		case 'h8':
+			rookSq = [newPos[0], newPos[1] - 2];
+			kingSq = [newPos[0], newPos[1] - 1];
+			break;
+		default:
+			rookSq = [newPos[0], newPos[1] - 2];
+			kingSq = [newPos[0], newPos[1] - 1];
+			break;
+	}
+	const newKingSq = getSquareFromRC(kingSq);
+	const newRookSq = getSquareFromRC(rookSq);
+
+	const indexKing = board.findIndex((element) => element.square === newKingSq);
+	const indexRook = board.findIndex((element) => element.square === newRookSq);
+	return { indexRook, indexKing };
 }
