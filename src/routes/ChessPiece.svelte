@@ -195,16 +195,6 @@
 </div>
 
 <style>
-	.chess-piece {
-		cursor: grab;
-	}
-	.chess-piece:active {
-		cursor: grabbing;
-	}
-
-	/* .chess-piece:-moz-drag-over {
-		cursor: grabbing;
-	} */
 	/* .dragging {
 		background-color: pink;
 	} */

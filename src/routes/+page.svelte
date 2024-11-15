@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { slide } from 'svelte/transition';
+	import '$lib/assets/pieces.css';
 
 	import { onMount, tick } from 'svelte';
 	import ChessBoard from '$routes/ChessBoard.svelte';
@@ -7,8 +8,8 @@
 	import { spring } from 'svelte/motion';
 	import { setBoard } from '$src/lib/utils/board';
 	import { calcMoves } from '$lib/utils/moves/validate';
+	import { notifications } from '$src/store/notifications/notifications';
 	// import { findBestMove } from '$src/lib/utils/minmax';
-
 	let startBoard: SquareOnBoard[] = $state.raw(setBoard());
 	let board: SquareOnBoard[] = $state(setBoard());
 	// let botBoard: SquareOnBoard[] = $state(setBoard());
@@ -27,7 +28,7 @@
 	let botVsBot = $state(false);
 	let gameOver = $state(false);
 
-	function restartGame() {
+	async function restartGame() {
 		myKills = 0;
 		theirKills = 0;
 		myKillsArr = [];
@@ -51,13 +52,18 @@
 			theirKills += 1;
 		}
 		if (event.detail.kill === 'black-king') {
-			alert('YOU WIN!');
+			// alert('YOU WIN!');
+			// await tick();
+			notifications.success('YOU WIN!', 2000);
 			await tick();
+
 			gameOver = true;
 
 			restartGame();
 		} else if (event.detail.kill === 'white-king') {
-			alert('YOU LOSE!');
+			// alert('YOU LOSE!');
+			// await tick();
+			notifications.danger('YOU LOSE!', 2000);
 			await tick();
 			gameOver = true;
 			restartGame();
@@ -127,6 +133,11 @@
 
 		<div class="gradient-border score-card">
 			<div class="player-name">Black Player</div>
+			<div class="kills container">
+				{#each theirKillsArr as piece}
+					<span class={piece}></span>
+				{/each}
+			</div>
 			<div class="counter-viewport">
 				<div class="counter-digits" style="transform: translate(0, {100 * offset2}%)">
 					<strong class="hidden" aria-hidden="true">{Math.floor($their_displayed_count + 1)}</strong
@@ -150,6 +161,11 @@
 
 		<div class="gradient-border score-card">
 			<div class="player-name">White Player</div>
+			<div class="kills flex-wr">
+				{#each myKillsArr as piece}
+					<span class="{piece} chess-piece-win"></span>
+				{/each}
+			</div>
 			<div class="counter-viewport">
 				<div class="counter-digits" style="transform: translate(0, {100 * offset}%)">
 					<strong class="hidden" aria-hidden="true">{Math.floor($displayed_count + 1)}</strong>
@@ -221,6 +237,18 @@
 </div> -->
 
 <style>
+	.kills {
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: -webkit-flex;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		-ms-flex-wrap: wrap;
+		-webkit-flex-wrap: wrap;
+		flex-wrap: wrap;
+		width: 80%;
+	}
 	.startBtn {
 		cursor: pointer;
 	}

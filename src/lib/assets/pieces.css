@@ -1,0 +1,96 @@
+.white-king:before {
+  content: '\2654';
+}
+
+.white-queen:before {
+  content: '\2655';
+}
+
+.white-rook:before {
+  content: '\2656';
+}
+
+.white-bishop:before {
+  content: '\2657';
+}
+
+.white-knight:before {
+  content: '\2658';
+}
+
+.white-pawn:before {
+  content: '\2659';
+  /* font-weight: 600; */
+}
+
+.black-king:before {
+  content: '\265A';
+}
+
+.black-queen:before {
+  content: '\265B';
+}
+
+.black-rook:before {
+  content: '\265C';
+}
+
+.black-bishop:before {
+  content: '\265D';
+}
+
+.black-knight:before {
+  content: '\265E';
+}
+
+.black-pawn:before {
+  content: '\265F';
+}
+
+.chess-piece {
+  cursor: grab;
+}
+
+.chess-piece-win {
+  background: linear-gradient(
+      60deg,
+      #f79533,
+      #f37055,
+      #ef4e7b,
+      #a166ab,
+      #5073b8,
+      #1098ad,
+      #07b39b,
+      #6fba82
+  );
+  background-size: 300% 300%;
+  animation: animated-gradient 3s ease alternate infinite;
+  
+  /* These properties are crucial for gradient text */
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+@keyframes animated-gradient {
+  0% {
+      background-position: 0% 50%;
+  }
+  50% {
+      background-position: 100% 50%;
+  }
+  100% {
+      background-position: 0% 50%;
+  }
+}
+.chess-piece:active {
+  cursor: grabbing;
+}
+
+.chess-piece:-moz-drag-over {
+  cursor: grabbing;
+}
+.chess-piece:active {
+  opacity: 0.5;
+}

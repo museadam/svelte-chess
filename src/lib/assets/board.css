@@ -1,0 +1,38 @@
+.chess-board {
+  display: grid;
+  grid-template-columns: repeat(8, 40px);
+  grid-template-rows: repeat(8, 40px);
+  grid-gap: 0;
+}
+.squareLabel {
+  position: absolute;
+  font-size: 0.66rem; /* 14px */
+  line-height: 1.1rem; /* 20px */
+  top: -12px;
+  left: 2px;
+}
+
+.square {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+}
+
+.dark {
+  background-color: #769656;
+}
+
+.light {
+  background-color: #eee;
+}
+
+.dark:hover {
+  background-color: #41532d;
+}
+
+.light:hover {
+  background-color: rgb(99, 98, 98);
+}

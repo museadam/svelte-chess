@@ -17,6 +17,8 @@ const config = {
 			$src: './src/',
 			$lib: './src/lib/',
 			$routes: './src/routes/',
+			$store: './src/store/',
+
 			$types: './types/',
 
 		}

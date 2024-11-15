@@ -1,4 +1,6 @@
 <script lang="ts">
+	import '$lib/assets/board.css';
+
 	import { createEventDispatcher, tick } from 'svelte';
 	const dispatch = createEventDispatcher();
 	import ChessPiece from '$routes/ChessPiece.svelte';
@@ -177,8 +179,6 @@
 				board[rowIndex].potentialMoves = [];
 				touch = false;
 
-				await tick();
-
 				const moveItem: MoveHistory = {
 					to: square.square,
 					from: pieceSquare,
@@ -190,7 +190,7 @@
 
 				calcMoves(board, moveHistory);
 				// setTimeout(() => {}, 1000);
-
+				// setTimeout( () => {
 				if (selectedColor === 'white' && cpu) {
 					currentPlayer = 'black';
 
@@ -214,6 +214,7 @@
 					// }, 500);
 					calcMoves(board, moveHistory);
 				}
+				// }, 1000);
 
 				if (currentPlayer === 'white') {
 					currentPlayer = 'black';
@@ -336,27 +337,6 @@
 </div>
 
 <style>
-	/* :global([draggable]) {
-		-webkit-touch-callout: none;
-		-ms-touch-action: none;
-		touch-action: none;
-		-moz-user-select: none;
-		-webkit-user-select: none;
-		-ms-user-select: none;
-		user-select: none;
-	} */
-
-	.squareLabel {
-		position: absolute;
-		font-size: 0.66rem; /* 14px */
-		line-height: 1.1rem; /* 20px */
-		top: -12px;
-		left: 2px;
-	}
-	.m-2 {
-		margin: 0.5rem; /* 4px */
-		margin-top: 0.8rem;
-	}
 	.turn-text {
 		-webkit-box-pack: center;
 		-ms-flex-pack: center;
@@ -371,101 +351,8 @@
 		line-height: 1.75rem; /* 28px */
 		color: rgb(33, 33, 33);
 	}
-	.chess-board {
-		display: grid;
-		grid-template-columns: repeat(8, 40px);
-		grid-template-rows: repeat(8, 40px);
-		grid-gap: 0;
-	}
-	.chess-piece {
-		width: 40px;
-		height: 40px;
-		user-select: none;
-		z-index: 10;
-		pointer-events: none;
-	}
 
 	.chess-square:hover .chess-piece {
 		pointer-events: all;
-	}
-
-	.chess-piece:active {
-		opacity: 0.5;
-	}
-	/* .chess-row {
-		position: relative;
-	} */
-	.square {
-		width: 40px;
-		height: 40px;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		font-size: 30px;
-	}
-
-	.dark {
-		background-color: #769656;
-	}
-
-	.light {
-		background-color: #eee;
-	}
-
-	.dark:hover {
-		background-color: #41532d;
-	}
-
-	.light:hover {
-		background-color: rgb(99, 98, 98);
-	}
-
-	.white-king:before {
-		content: '\2654';
-	}
-
-	.white-queen:before {
-		content: '\2655';
-	}
-
-	.white-rook:before {
-		content: '\2656';
-	}
-
-	.white-bishop:before {
-		content: '\2657';
-	}
-
-	.white-knight:before {
-		content: '\2658';
-	}
-
-	.white-pawn:before {
-		content: '\2659';
-		/* font-weight: 600; */
-	}
-
-	.black-king:before {
-		content: '\265A';
-	}
-
-	.black-queen:before {
-		content: '\265B';
-	}
-
-	.black-rook:before {
-		content: '\265C';
-	}
-
-	.black-bishop:before {
-		content: '\265D';
-	}
-
-	.black-knight:before {
-		content: '\265E';
-	}
-
-	.black-pawn:before {
-		content: '\265F';
 	}
 </style>

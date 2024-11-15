@@ -1,5 +1,7 @@
 <script lang="ts">
 	import './styles.css';
+	import Toast from '$lib/components/toast/Toast.svelte';
+
 	interface Props {
 		children?: import('svelte').Snippet;
 	}
@@ -9,6 +11,8 @@
 
 <div class="app">
 	<main>
+		<Toast />
+
 		{@render children?.()}
 	</main>
 </div>
