@@ -15,7 +15,7 @@
 	// let botBoard: SquareOnBoard[] = $state(setBoard());
 	let moveHistory: MoveHistory[] = $state([]);
 
-	// $inspect(startBoard);
+	$inspect(board);
 	// $inspect(moveHistory);
 
 	let myKills = $state(0);
@@ -99,8 +99,9 @@
 
 			// if (row) botBoard[+row] = { ...botBoard[+row], coordinates };
 		});
+		// calcMoves(board, []);
 	}
-	$effect(() => {});
+	// $effect(() => {});
 
 	const displayed_count = $state(spring(0));
 	const their_displayed_count = $state(spring(0));

@@ -1,6 +1,7 @@
 import type { SquareOnBoard, ValidMove, MoveHistory } from '$types/board';
-import { getRowAndColumn, getSquareDetails, getSquareFromRC } from '..';
-import { calcMoves } from '../validate';
+import { getSquareDetails, getSquareFromRC } from '..';
+import { createMovesAfter, isPotentialDeath } from './attackers';
+import { castleMoves } from './castle';
 
 export function getKingMoves(
 	board: SquareOnBoard[],
@@ -41,11 +42,27 @@ export function getKingMoves(
 			const targetSquare = getSquareFromRC([newRow, newCol]);
 			const boardDetail = board.find((el) => el.square === targetSquare);
 			if (boardDetail) {
+				// const safeMove = isPotentialDeath(board, [newRow, newCol], player);
+				// if (!safeMove) {
+				// 	// console.log(getPlayer);
+
+				// 	const getSquare = getSquareDetails(getPlayer, board);
+				// 	// console.log(getSquare);
+				// 	const safeMoveAfter = createMovesAfter(
+				// 		board,
+				// 		[newRow, newCol],
+				// 		getSquare,
+				// 		moveHistory,
+				// 		player
+				// 	);
+				// 	if (!safeMoveAfter) {
 				if (boardDetail.piece === '') {
 					validMoves.push([newRow, newCol, 'move', 0]);
 				} else if (!boardDetail.piece.includes(player)) {
 					validMoves.push([newRow, newCol, 'attack', 0]);
 				}
+				// }
+				// }
 			}
 		}
 	}
@@ -58,167 +75,6 @@ export function getKingMoves(
 }
 
 // Helper function to determine if a square is under attack
-function isUnderAttack(board: SquareOnBoard[], row: number, col: number, player: string): boolean {
-	for (const square of board) {
-		if (square.piece && !square.piece.includes(player) && square.potentialMoves) {
-			for (const move of square.potentialMoves) {
-				if (move[0] === row && move[1] === col) {
-					return true; // Square is under attack
-				}
-			}
-		}
-	}
-	return false;
-}
-export function createMovesAfter(
-	board: SquareOnBoard[],
-	move: number[],
-	oldLocation: SquareOnBoard,
-	moveHistory: MoveHistory[],
-	player: string
-) {
-	const newBoard = board.map((sq) => ({ ...sq })); // Create a deep copy of the board
-	const targetSquare = newBoard.find((sq) => sq.square === getSquareFromRC([move[0], move[1]]));
-	const oldSquare = newBoard.find((sq) => sq.square === oldLocation.square);
-	if (targetSquare && oldSquare) {
-		targetSquare.piece = oldLocation.piece; // Move piece to target
-		// targetSquare.potentialMoves = squa;re.potentialMoves
-
-		oldSquare.piece = ''; // Clear original square
-		oldSquare.potentialMoves = undefined; // Clear original square
-		calcMoves(newBoard, moveHistory);
-	}
-	return isPotentialDeath(newBoard, move, player);
-}
-
-export function isPotentialDeath(
-	board: SquareOnBoard[],
-	newPos: number[] | ValidMove[],
-	player: string
-): boolean {
-	let ret = false;
-	for (const square of board) {
-		if (square.piece && !square.piece.includes(player) && square.potentialMoves) {
-			if (square.piece.includes('pawn')) {
-				const move = getRowAndColumn(square.square);
-				const pawnAttack = checkPotentialPawnAttacks(player, move);
-				if (pawnAttack[0][0] === newPos[0] && pawnAttack[0][1] === newPos[1]) ret = true;
-				if (pawnAttack[1][0] === newPos[0] && pawnAttack[1][1] === newPos[1]) ret = true;
-			}
-			for (const move of square.potentialMoves) {
-				// if (square.piece.includes('knight')) {
-				// 	console.log('knight moves: ');
-
-				// 	console.log(move);
-				// 	console.log('move');
-				// 	console.log(newPos);
-				// 	console.log('newPos');
-				// }
-
-				// console.log(square);
-
-				if (move[0] === newPos[0] && move[1] === newPos[1]) {
-					if (square.piece.includes('pawn')) {
-						if (move[2] !== 'attack') {
-							ret = false;
-							// console.log('pawwn retter');
-						} else ret = true;
-					} else {
-						ret = true;
-					}
-				}
-			}
-		}
-	}
-
-	return ret;
-}
-function checkPotentialPawnAttacks(player: string, move: ValidMove | number[]) {
-	let retL = [0, 0];
-	let retR = [0, 0];
-	if (player === 'white') {
-		retL[0] = move[0] + 1;
-		retR[0] = move[0] + 1;
-	} else {
-		retL[0] = move[0] - 1;
-		retR[0] = move[0] - 1;
-	}
-
-	retL[1] = move[1] - 1;
-	retR[1] = move[1] + 1;
-
-	return [retL, retR];
-}
-
-function castleMoves(
-	board: SquareOnBoard[],
-	currentPos: number[],
-	moveHistory: MoveHistory[]
-): ValidMove[] | undefined {
-	const getPlayer = getSquareFromRC(currentPos);
-	const player = board.find((el) => el.square === getPlayer)?.piece.includes('white')
-		? 'white'
-		: 'black';
-	const [currentRow, currentCol] = currentPos;
-	const king = `${player}-king`;
-	// console.log(player);
-	let leftRook = 'a1';
-	let rightRook = 'h1';
-	if (player === 'black') {
-		leftRook = 'h8';
-		rightRook = 'a8';
-	}
-	let validMoves: ValidMove[] | undefined;
-	let hasKingMoved: boolean | MoveHistory =
-		moveHistory.find((el) => el.movedPiece === king) ?? false;
-	let hasLeftRookMoved: boolean | MoveHistory =
-		moveHistory.find((el) => el.from === leftRook) ?? false;
-	let hasRightRookMoved: boolean | MoveHistory =
-		moveHistory.find((el) => el.from === rightRook) ?? false;
-	if (!hasKingMoved) {
-		validMoves = [];
-		// King-side castling (right)
-		if (!hasRightRookMoved) {
-			const rightSquares = [
-				getSquareFromRC([currentRow, currentCol + 1]),
-				getSquareFromRC([currentRow, currentCol + 2])
-			];
-			const isClearPath = rightSquares.every(
-				(sq) => board.find((el) => el.square === sq)?.piece === ''
-			);
-
-			if (
-				isClearPath &&
-				!isUnderAttack(board, currentRow, currentCol + 1, player) &&
-				!isUnderAttack(board, currentRow, currentCol + 2, player)
-			) {
-				validMoves.push([currentRow, currentCol + 3, 'castle', 0]); // Add king-side castle move
-			}
-		}
-
-		// Queen-side castling (left)
-		if (!hasLeftRookMoved) {
-			const leftSquares = [
-				getSquareFromRC([currentRow, currentCol - 1]),
-				getSquareFromRC([currentRow, currentCol - 2]),
-				getSquareFromRC([currentRow, currentCol - 3])
-			];
-			const isClearPath = leftSquares.every(
-				(sq) => board.find((el) => el.square === sq)?.piece === ''
-			);
-
-			if (
-				isClearPath &&
-				!isUnderAttack(board, currentRow, currentCol - 1, player) &&
-				!isUnderAttack(board, currentRow, currentCol - 2, player)
-			) {
-				validMoves.push([currentRow, currentCol - 3, 'castle', 0]); // Add queen-side castle move
-				// validMoves.push([currentRow, currentCol - 2, 'castleRook', 0]); // Add queen-side castle move
-			}
-		}
-	}
-	return validMoves;
-}
 
 export function kingMove(
 	board: SquareOnBoard[],
@@ -267,8 +123,8 @@ export function kingMove(
 
 		// 	return false;
 		// }
-		const check = ret.some((el) => el[0] === newRow && el[1] === newCol);
-		const item = ret.filter((el) => el[0] === newRow && el[1] === newCol);
+		// const check = ret.some((el) => el[0] === newRow && el[1] === newCol);
+		// const item = ret.filter((el) => el[0] === newRow && el[1] === newCol);
 
 		// console.log(item);
 		// console.log('item');
@@ -285,54 +141,20 @@ export function kingMove(
 			// console.log(getSquare);
 			safeMoveAfter = createMovesAfter(board, newPos, getSquare, moveHistory, player);
 		}
-		// console.log(safeMove);
-		// console.log('safeMove');
-		// console.log(safeMoveAfter);
-		// console.log('safeMoveAfter');
+		console.log(safeMove);
+		console.log('safeMove');
+		console.log(safeMoveAfter);
+		console.log('safeMoveAfter');
 		if (safeMove || safeMoveAfter) {
 			return false;
-		}
-		if (check) {
-			const castler = item[0][2] ?? false;
+		} else {
+			// const castler = item[0][2] ?? false;
 
 			// console.log('found a castle move');
-			const ret = castler === 'castle' ? 'castle' : true;
+			// const ret = castler === 'castle' ? 'castle' : true;
 
 			return ret;
 		}
 	}
-	return false;
-}
-
-export function getCastlePositions(square: string, newPos: number[], board: SquareOnBoard[]) {
-	let rookSq;
-	let kingSq;
-	switch (square) {
-		case 'h1':
-			rookSq = [newPos[0], newPos[1] - 2];
-			kingSq = [newPos[0], newPos[1] - 1];
-			break;
-		case 'a1':
-			rookSq = [newPos[0], newPos[1] + 2];
-			kingSq = [newPos[0], newPos[1] + 1];
-			break;
-		case 'a8':
-			rookSq = [newPos[0], newPos[1] + 2];
-			kingSq = [newPos[0], newPos[1] + 1];
-			break;
-		case 'h8':
-			rookSq = [newPos[0], newPos[1] - 2];
-			kingSq = [newPos[0], newPos[1] - 1];
-			break;
-		default:
-			rookSq = [newPos[0], newPos[1] - 2];
-			kingSq = [newPos[0], newPos[1] - 1];
-			break;
-	}
-	const newKingSq = getSquareFromRC(kingSq);
-	const newRookSq = getSquareFromRC(rookSq);
-
-	const indexKing = board.findIndex((element) => element.square === newKingSq);
-	const indexRook = board.findIndex((element) => element.square === newRookSq);
-	return { indexRook, indexKing };
+	return ret;
 }

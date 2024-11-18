@@ -9,7 +9,7 @@
 	import { calcMoves, validateMove } from '$lib/utils/moves/validate';
 	import { findBestMove } from '$src/lib/utils/minmax';
 	import { getMovePiece, useOpeningMove } from '$src/lib/utils/bot/starter-moves';
-	import { getCastlePositions } from '$src/lib/utils/moves/king';
+	import { getCastlePositions } from '$src/lib/utils/moves/king/castle';
 	// import Page from './+page.svelte';
 
 	interface Props {
@@ -142,14 +142,11 @@
 		// console.log('newPos');
 
 		const isValidMove = validateMove(board, piece, currentPos, moveHistory, newPos);
-		// console.log(isValidMove);
-		// console.log('isValidMove');
+		console.log(isValidMove);
+		console.log('isValidMove');
 		if (currentPlayer === selectedColor) {
-			if (
-				isValidMove &&
-				selectedPiece &&
-				(attackMove || square.piece === '' || isValidMove === 'castle')
-			) {
+			if (isValidMove) {
+				// && selectedPiece && (attackMove || square.piece === '')) {
 				let removedPiece;
 				if (attackMove) {
 					const kill = board[row].piece;
@@ -161,10 +158,14 @@
 				let upgradePiece: boolean | ValidMove[] | string = false;
 				upgradePiece = strValidMov?.includes('queen') === true ? isValidMove : false;
 
-				let castleIt: boolean | ValidMove[] = false;
-
-				if (isValidMove) castleIt = strValidMov?.includes('castle') === true ? true : false;
+				let castleIt: boolean = false;
+				const castle = board.filter((el) => el.piece?.includes(`${currentPlayer}-king`))[0];
+				console.log(castle);
+				if (castle?.potentialMoves)
+					castleIt = castle.potentialMoves.some((el) => el[2] === 'castle') ?? false;
+				// if (isValidMove) castleIt = strValidMov?.includes('castle') === true ? true : false;
 				if (castleIt) {
+					console.log('castleIt ' + castleIt);
 					let { indexKing, indexRook } = getCastlePositions(square.square, newPos, board);
 
 					board[row].piece = '';
