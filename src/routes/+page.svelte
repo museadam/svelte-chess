@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { slide } from 'svelte/transition';
 	import '$lib/assets/pieces.css';
+	import './menu.css';
 
 	import { onMount, tick } from 'svelte';
 	import ChessBoard from '$routes/ChessBoard.svelte';
@@ -9,13 +10,14 @@
 	import { setBoard } from '$src/lib/utils/board';
 	import { calcMoves } from '$lib/utils/moves/validate';
 	import { notifications } from '$src/store/notifications/notifications';
+	import PieceSpiral from './PieceSpiral.svelte';
 	// import { findBestMove } from '$src/lib/utils/minmax';
 	let startBoard: SquareOnBoard[] = $state.raw(setBoard());
 	let board: SquareOnBoard[] = $state(setBoard());
 	// let botBoard: SquareOnBoard[] = $state(setBoard());
 	let moveHistory: MoveHistory[] = $state([]);
 
-	$inspect(board);
+	// $inspect(board);
 	// $inspect(moveHistory);
 
 	let myKills = $state(0);
@@ -178,26 +180,27 @@
 {/if}
 {#if !startGame}
 	<div transition:slide class="sheet">
-		<div
-			tabindex="0"
-			role="button"
-			class="gradient-border score-card startBtn"
-			onclick={async () => {
-				startGame = true;
-				await setBoardCoords();
-				cpu = false;
-			}}
-			onkeypress={(e) => {
-				if (e.key === 'Shift+c') startGame = true;
-			}}
-		>
-			<div class="player-name">Player vs Player</div>
+		<div class="gradient-border">
+			<button
+				tabindex="0"
+				class=" startBtn split-button"
+				onclick={async () => {
+					startGame = true;
+					await setBoardCoords();
+					cpu = false;
+				}}
+				onkeypress={(e) => {
+					if (e.key === 'Shift+c') startGame = true;
+				}}
+			>
+				<div class="slide-red"></div>
+				<div class="slide-blue"></div>
+				<span class="button-text">Player vs Player</span>
+			</button>
 		</div>
-
-		<div
+		<button
 			tabindex="0"
-			role="button"
-			class="gradient-border score-card startBtn"
+			class="gradient-border startBtn split-button"
 			onclick={async () => {
 				startGame = true;
 				await setBoardCoords();
@@ -207,12 +210,13 @@
 				if (e.key === 'Shift+c') startGame = true;
 			}}
 		>
-			<div class="player-name">Player vs CPU</div>
-		</div>
-		<div
+			<div class="slide-red"></div>
+			<div class="slide-blue"></div>
+			<div class="button-text">Player vs CPU</div>
+		</button>
+		<button
 			tabindex="0"
-			role="button"
-			class="gradient-border score-card startBtn"
+			class=" startBtn split-button"
 			onclick={async () => {
 				startGame = true;
 				await setBoardCoords();
@@ -222,10 +226,13 @@
 				if (e.key === 'Shift+c') startGame = true;
 			}}
 		>
-			<div class="player-name">CPU vs CPU</div>
-		</div>
+			<div class="slide-red"></div>
+			<div class="slide-blue"></div>
+			<div class="button-text">CPU vs CPU</div>
+		</button>
 	</div>
 {/if}
+<PieceSpiral {board} />
 
 <!-- <div>
 	{#if myKills > 0}
@@ -250,26 +257,7 @@
 		flex-wrap: wrap;
 		width: 80%;
 	}
-	.startBtn {
-		cursor: pointer;
-	}
-	.btn {
-		all: unset;
-		display: flex;
-		width: 200px;
-		height: 40px;
-		align-items: center;
-		justify-content: center;
-		font-size: 1.35rem;
-		font-weight: 600;
-		background-color: #f2f2f2;
-		cursor: pointer;
-	}
 
-	.btn:active {
-		width: 195px;
-		height: 35px;
-	}
 	.counter-viewport {
 		width: 8em;
 		height: 4em;

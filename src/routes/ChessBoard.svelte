@@ -142,8 +142,10 @@
 		// console.log('newPos');
 
 		const isValidMove = validateMove(board, piece, currentPos, moveHistory, newPos);
-		console.log(isValidMove);
-		console.log('isValidMove');
+		// console.log(isValidMove);
+		// console.log('isValidMove');
+		// let check = false
+		// if (isValidMove?.length) check = isValidMove.some((el) => el[0] === newRow && el[1] === newCol);
 		if (currentPlayer === selectedColor) {
 			if (isValidMove) {
 				// && selectedPiece && (attackMove || square.piece === '')) {
@@ -160,12 +162,12 @@
 
 				let castleIt: boolean = false;
 				const castle = board.filter((el) => el.piece?.includes(`${currentPlayer}-king`))[0];
-				console.log(castle);
+				// console.log(castle);
 				if (castle?.potentialMoves)
 					castleIt = castle.potentialMoves.some((el) => el[2] === 'castle') ?? false;
 				// if (isValidMove) castleIt = strValidMov?.includes('castle') === true ? true : false;
 				if (castleIt) {
-					console.log('castleIt ' + castleIt);
+					// console.log('castleIt ' + castleIt);
 					let { indexKing, indexRook } = getCastlePositions(square.square, newPos, board);
 
 					board[row].piece = '';
@@ -179,6 +181,7 @@
 				board[rowIndex].piece = '';
 				board[rowIndex].potentialMoves = [];
 				touch = false;
+				await tick();
 
 				const moveItem: MoveHistory = {
 					to: square.square,
@@ -191,39 +194,42 @@
 
 				calcMoves(board, moveHistory);
 				// setTimeout(() => {}, 1000);
-				// setTimeout( () => {
-				if (selectedColor === 'white' && cpu) {
-					currentPlayer = 'black';
+				setTimeout(() => {
+					if (selectedColor === 'white' && cpu) {
+						currentPlayer = 'black';
 
-					let bes;
+						let bes;
 
-					let bmL = [...$state.snapshot(botMoves)].length;
+						let bmL = [...$state.snapshot(botMoves)].length;
 
-					if (bmL < botCurrentMove + 1) {
-						await tick();
+						if (bmL < botCurrentMove + 1) {
+							// await tick();
 
-						// setTimeout(() => {
-						bes = findBestMove([...$state.snapshot(board)], 2, 'black', moveHistory);
+							// setTimeout(() => {
+							bes = findBestMove([...$state.snapshot(board)], 2, 'black', moveHistory);
 
-						// }, 300);
-					} else {
-						bes = getBotStarterMoves('black', botMoves);
+							// }, 300);
+						} else {
+							bes = getBotStarterMoves('black', botMoves);
+						}
+						// await tick();
+
+						//  setTimeout(async () => {
+
+						// }, 500);
+
+						moveBot(bes);
+						calcMoves(board, moveHistory);
 					}
-					// setTimeout(() => {
 
-					moveBot(bes);
-					// }, 500);
-					calcMoves(board, moveHistory);
-				}
-				// }, 1000);
-
-				if (currentPlayer === 'white') {
-					currentPlayer = 'black';
-					nextPlayer = 'white';
-				} else {
-					currentPlayer = 'white';
-					nextPlayer = 'black';
-				}
+					if (currentPlayer === 'white') {
+						currentPlayer = 'black';
+						nextPlayer = 'white';
+					} else {
+						currentPlayer = 'white';
+						nextPlayer = 'black';
+					}
+				}, 600);
 			} else {
 				console.log('Cant move there');
 			}
@@ -262,7 +268,7 @@
 		currentPlayer = currentPlayer === 'black' ? 'white' : 'black';
 		setTimeout(() => {
 			recursive();
-		}, 2500);
+		}, 2000);
 	}
 	function recursive() {
 		if (!watchGame) vsBots();

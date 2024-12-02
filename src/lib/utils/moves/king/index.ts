@@ -95,37 +95,8 @@ export function kingMove(
 	// console.log(ret);
 	// let basic move check
 	if (newRow && newCol && newPos) {
-		// console.log(newPos);
-		// console.log('newPos');
-
-		// if ()
-
-		// const getMoves = castleMoves(board, currentPos, moveHistory);
-		// if (getMoves) validMoves = [...validMoves, ...getMoves];
-
-		// if (newRow - currentRow > 1) {
-		// 	console.log('row check');
-
-		// 	return false;
-		// }
-		// if (newCol - currentCol > 1) {
-		// 	console.log('col check');
-
-		// 	return false;
-		// }
-		// if (currentRow - newRow > 1) {
-		// 	console.log('row check');
-
-		// 	return false;
-		// }
-		// if (currentCol - newCol > 1) {
-		// 	console.log('col check');
-
-		// 	return false;
-		// }
-		// const check = ret.some((el) => el[0] === newRow && el[1] === newCol);
-		// const item = ret.filter((el) => el[0] === newRow && el[1] === newCol);
-
+		const check = ret.some((el) => el[0] === newRow && el[1] === newCol);
+		const castles = ret.some((el) => el[2] === 'castle' && el[1] === newCol);
 		// console.log(item);
 		// console.log('item');
 		// console.log(check);
@@ -141,10 +112,10 @@ export function kingMove(
 			// console.log(getSquare);
 			safeMoveAfter = createMovesAfter(board, newPos, getSquare, moveHistory, player);
 		}
-		console.log(safeMove);
-		console.log('safeMove');
-		console.log(safeMoveAfter);
-		console.log('safeMoveAfter');
+		// console.log(safeMove);
+		// console.log('safeMove');
+		// console.log(safeMoveAfter);
+		// console.log('safeMoveAfter');
 		if (safeMove || safeMoveAfter) {
 			return false;
 		} else {
@@ -153,7 +124,16 @@ export function kingMove(
 			// console.log('found a castle move');
 			// const ret = castler === 'castle' ? 'castle' : true;
 
-			return ret;
+			if (check) {
+				return ret;
+			} else {
+				if (
+					// (castles[0][2] === 'castle' || castles[1][2] === 'castle')
+					castles
+				)
+					return ret;
+				else return false;
+			}
 		}
 	}
 	return ret;

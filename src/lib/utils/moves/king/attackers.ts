@@ -45,10 +45,10 @@ export function isPotentialDeath(
 				// console.log(square);
 
 				if (move[0] === newPos[0] && move[1] === newPos[1]) {
-					console.log(move);
-					console.log('move');
-					console.log(newPos);
-					console.log('newPos');
+					// console.log(move);
+					// console.log('move');
+					// console.log(newPos);
+					// console.log('newPos');
 					if (square.piece.includes('pawn')) {
 						if (move[2] !== 'attack') {
 							ret = false;
