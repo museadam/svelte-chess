@@ -10,7 +10,7 @@
 	import { setBoard } from '$src/lib/utils/board';
 	import { calcMoves } from '$lib/utils/moves/validate';
 	import { notifications } from '$src/store/notifications/notifications';
-	import PieceSpiral from './PieceSpiral.svelte';
+	// import PieceSpiral from './PieceSpiral.svelte';
 	// import { findBestMove } from '$src/lib/utils/minmax';
 	let startBoard: SquareOnBoard[] = $state.raw(setBoard());
 	let board: SquareOnBoard[] = $state(setBoard());
@@ -232,7 +232,8 @@
 		</button>
 	</div>
 {/if}
-<PieceSpiral {board} />
+
+<!-- <PieceSpiral {board} /> -->
 
 <!-- <div>
 	{#if myKills > 0}
